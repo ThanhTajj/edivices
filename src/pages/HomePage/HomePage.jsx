@@ -54,8 +54,8 @@ const HomePage = () => {
           })}
         </WrapperTypeProduct>
       </div>
-      <div className='body' style={{ width: '100%', backgroundColor: '#efefef', }}>
-        <div id="container" style={{ height: '1000px', width: '1270px', margin: '0 auto' }}>
+      <div className='body' style={{ width: '100%', backgroundColor: '#ececec', }}>
+        <div id="container" style={{ height: '1000px', width: '1270px', margin: '0 auto' , backgroundColor: '#ffffff' }}>
           <SliderComponent arrImages={[slider1, slider2, slider3]} />
           <WrapperProducts>
             {products?.data?.map((product) => {

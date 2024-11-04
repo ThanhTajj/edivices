@@ -5,8 +5,15 @@ export const WrapperCardStyle = styled(Card)`
     width: 200px;
     & img {
         height: 200px;
-        width: 200px;
+        width: 198px;
     },
+
+    & cover{
+        margin-top: 0px;
+        margin-right: 0px;
+        margin-left: 0px;
+    }
+    
     position: relative;
     background-color: ${props => props.disabled ? '#ccc' : '#fff'};
     cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'}

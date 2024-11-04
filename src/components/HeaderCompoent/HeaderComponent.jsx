@@ -83,10 +83,10 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
     <div style={{  heiht: '100%', width: '100%', display: 'flex',background: '#9255FD', justifyContent: 'center' }}>
       <WrapperHeader style={{ justifyContent: isHiddenSearch && isHiddenSearch ? 'space-between' : 'unset' }}>
         <Col span={5}>
-          <WrapperTextHeader to='/'>SHOP</WrapperTextHeader>
+          <WrapperTextHeader to='/'>ComputerShop</WrapperTextHeader>
         </Col>
         {!isHiddenSearch && (
-          <Col span={13}>
+          <Col span={11}>
             <ButttonInputSearch
               size="large"
               bordered={false}
@@ -97,7 +97,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
             />
           </Col>
         )}
-        <Col span={6} style={{ display: 'flex', gap: '54px', alignItems: 'center' }}>
+        <Col span={8} style={{ display: 'flex', gap: '54px', alignItems: 'center' , marginLeft:'40px' }}>
           <Loading isLoading={loading}>
             <WrapperHeaderAccout>
               {userAvatar ? (
@@ -110,10 +110,10 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
               ) : (
                 <UserOutlined style={{ fontSize: '30px' }} />
               )}
-              {user?.access_token ? (
+              {user?.email ? (
                 <>
                   <Popover content={content} trigger="click" open={isOpenPopup}>
-                    <div style={{ cursor: 'pointer',maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis' }} onClick={() => setIsOpenPopup((prev) => !prev)}>{userName?.length ? userName : user?.email}</div>
+                    <div style={{ cursor: 'pointer',maxWidth: 120, overflow: 'hidden', textWrap:'nowrap' }} onClick={() => setIsOpenPopup((prev) => !prev)}>{userName?.length ? userName : user?.email}</div>
                   </Popover>
                 </>
               ) : (
@@ -128,7 +128,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
             </WrapperHeaderAccout>
           </Loading>
           {!isHiddenCart && (
-            <div onClick={() => navigate('/order')} style={{cursor: 'pointer'}}>
+            <div onClick={() => navigate('/order')} style={{cursor: 'pointer' , display:'flex' , alignItems:'center' , gap: '8px'}}>
               <Badge count={order?.orderItems?.length} size="small">
                 <ShoppingCartOutlined style={{ fontSize: '30px', color: '#fff' }} />
               </Badge>
