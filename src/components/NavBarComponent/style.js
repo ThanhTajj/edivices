@@ -4,6 +4,7 @@ export const WrapperLableText = styled.h4`
     color: rgb(56,56,61);
     font-size: 17px;
     font-weight: 500;
+    margin:0 0 10px 0;
 `
 
 export const WrapperTextValue = styled.span`

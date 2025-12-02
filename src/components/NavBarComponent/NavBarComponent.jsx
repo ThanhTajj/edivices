@@ -44,23 +44,12 @@ const NavBarComponent = () => {
     }
   }
   return (
-    <div style={{backgroundColor:'#fff'}}>
+    <div>
       <WrapperLableText>Lable</WrapperLableText>
       <WrapperContent>
         {renderContent('text', ['Tu lanh','TV', 'May giat'])}
       </WrapperContent>
-      <WrapperContent>
-        {renderContent('checkbox', [
-          {value: 'a', label: 'A'},
-          {value: 'b', label: 'B'}
-        ])}
-      </WrapperContent>
-      <WrapperContent>
-        {renderContent('star', [3,4,5])}
-      </WrapperContent>
-      <WrapperContent>
-        {renderContent('price', ['Duoi 40','Tren 50'])}
-      </WrapperContent>
+      
     </div>
   )
 }
