@@ -7,12 +7,12 @@ import ButtonInputSearch from '../ButtonInputSearch/ButtonInputSearch';
 
 const HeaderComponent = () => {
   return (
-    <div>
+    <div style={{ width:'100%' }}>
       <WrapperHeader>
-        <Col span={6}>
+        <Col span={5}>
           <WrapperTextHeader>EDIVCES</WrapperTextHeader>
         </Col>
-        <Col span={12}>
+        <Col span={13}>
           <ButtonInputSearch
             placeholder="input search text"
             textButton="Tìm kiếm"
@@ -30,7 +30,7 @@ const HeaderComponent = () => {
               </div>
             </div>
           </WrapperHeaderAccount>
-          <div>
+          <div style={{display:'flex', flexWrap:'nowrap'}}>
             <Badge count={4} size='small'>
               <ShoppingCartOutlined style={{ fontSize: '25px', color: '#fff'}}/>
             </Badge>

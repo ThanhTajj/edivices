@@ -32,13 +32,13 @@ export const routes = [
     {
         path: '/sign-in',
         page: SignInPage,
-        isShowHeader: true
+        isShowHeader: false
     },
     
     {
         path: '/sign-up',
         page: SignUpPage,
-        isShowHeader: true
+        isShowHeader: false
     },
     
     {

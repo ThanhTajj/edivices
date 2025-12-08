@@ -26,4 +26,5 @@ export const WrapperTextHeaderSmall = styled.span`
     font-size: 12px;
     color: #fff;
     white-space: nowrap;
+    padding-top: 9px;
 `
