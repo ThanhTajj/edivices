@@ -10,11 +10,11 @@ function App() {
   //   fetchApi()
   // }, [])
 
-  const fetchApi = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all`)
-  }
+  // const fetchApi = async () => {
+  //   const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all`)
+  // }
 
-  const query = useQuery({ queryKey:['todos'], queryFn: fetchApi })
+  // const query = useQuery({ queryKey:['todos'], queryFn: fetchApi })
 
   return (
     <div>
