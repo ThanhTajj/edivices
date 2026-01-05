@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { WrapperContainerLeft, WrapperContainerRight, WrapperTextLight } from './style'
 import InputForm from '../../components/InputForm/InputForm'
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent'
@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import * as UserService from '../../services/UserService'
 import { useMutationHook } from '../../hooks/useMutationHook'
 import Loading from '../../components/LoadingComponent/LoadingComponent'
+import * as message from '../../components/Message/Message'
 
 const SignUpPage = () => {
   const [email, setEmail] = useState('')
@@ -20,7 +21,16 @@ const SignUpPage = () => {
     data => UserService.signupUser(data)
   )
 
-  const {data, isPending} = mutation
+  const {data, isPending, isSuccess, isError} = mutation
+
+  useEffect(() => {
+    if (isSuccess) {
+      message.success()
+      handleNavigateSignIn()
+    } else if (isError) {
+      message.error()
+    }
+  }, [isSuccess, isError])
 
   const handleNavigateSignIn = () => {
     navigate('/sign-in')

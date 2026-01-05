@@ -4,9 +4,11 @@ import { WrapperHeader, WrapperHeaderAccount, WrapperTextHeader, WrapperTextHead
 import { UserOutlined, CaretDownOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import ButtonInputSearch from '../ButtonInputSearch/ButtonInputSearch';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const HeaderComponent = () => {
   const navigate = useNavigate()
+  const user = useSelector((state) => state.user)
   const handleNavigateLogin = () => {
     navigate('/sign-in')
   }
@@ -27,12 +29,16 @@ const HeaderComponent = () => {
         <Col span={6} style={{ display: 'flex', gap: '20px', alignItems:'center'}}>
           <WrapperHeaderAccount>
             <UserOutlined style={{ fontSize: '25px'}}/>
-            <div onClick={handleNavigateLogin} style={{cursor:'pointer'}}>
-              <WrapperTextHeaderSmall>Đăng nhập/Đăng ký</WrapperTextHeaderSmall>
-              <div>
-                <WrapperTextHeaderSmall>Tài khoản<CaretDownOutlined /></WrapperTextHeaderSmall>
+            {user?.name ? (
+              <div style={{cursor:'pointer'}}>{user?.name}</div>
+            ) : (
+              <div onClick={handleNavigateLogin} style={{cursor:'pointer'}}>
+                <WrapperTextHeaderSmall>Đăng nhập/Đăng ký</WrapperTextHeaderSmall>
+                <div>
+                  <WrapperTextHeaderSmall>Tài khoản<CaretDownOutlined /></WrapperTextHeaderSmall>
+                </div>
               </div>
-            </div>
+            )}
           </WrapperHeaderAccount>
           <div style={{display:'flex', flexWrap:'nowrap'}}>
             <Badge count={4} size='small'>
