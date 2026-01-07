@@ -28,3 +28,10 @@ export const WrapperTextHeaderSmall = styled.span`
     white-space: nowrap;
     padding-top: 9px;
 `
+
+export const WrapperContentPopup = styled.p`
+    cursor: pointer;
+    &:hover {
+        background-color: rgb(240, 240, 240);
+    }
+`
