@@ -20,7 +20,7 @@ const HomePage = () => {
   const [loading, setLoading] = useState(false)
   const [limit, setLimit] = useState(6)
   const [typeProducts, setTypeProducts] = useState([])
-  
+
   const fetchProductAll = async (context) => {
     const limit = context?.queryKey && context?.queryKey[1]
     const search = context?.queryKey && context?.queryKey[2]
@@ -32,7 +32,7 @@ const HomePage = () => {
 
   const fetchAllTypeProduct = async () => {
     const res = await ProductService.getAllTypeProduct()
-    if(res?.status === 'OK') {
+    if (res?.status === 'OK') {
       setTypeProducts(res?.data)
     }
   }
@@ -49,13 +49,13 @@ const HomePage = () => {
         <WrapperTypeProduct>
           {typeProducts.map((item) => {
             return (
-              <TypeProduct name={item} key={item}/>
+              <TypeProduct name={item} key={item} />
             )
           })}
         </WrapperTypeProduct>
       </div>
-      <div className='body' style={{ width: '100%', backgroundColor: '#ececec', }}>
-        <div id="container" style={{ height: '1000px', width: '1270px', margin: '0 auto' , backgroundColor: '#ffffff' }}>
+      <div className='body' style={{ width: '100%', backgroundColor: '#ececec', paddingTop: '20px' }}>
+        <div id="container" style={{ height: '1000px', width: '1270px', margin: '0 auto', backgroundColor: '#ffffff' }}>
           <SliderComponent arrImages={[slider1, slider2, slider3]} />
           <WrapperProducts>
             {products?.data?.map((product) => {
@@ -79,7 +79,7 @@ const HomePage = () => {
           <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
             <WrapperButtonMore
               textbutton={isPreviousData ? 'Load more' : "Xem thêm"} type="outline" styleButton={{
-                border: `1px solid ${products?.total === products?.data?.length ? '#f5f5f5' : '#9255FD'}`, color: `${products?.total === products?.data?.length ? '#f5f5f5' : '#9255FD'}`,
+                border: `1px solid ${products?.total === products?.data?.length ? '#f5f5f5' : '#0057D9'}`, color: `${products?.total === products?.data?.length ? '#f5f5f5' : '#0057D9'}`,
                 width: '240px', height: '38px', borderRadius: '4px'
               }}
               disabled={products?.total === products?.data?.length || products?.totalPage === 1}

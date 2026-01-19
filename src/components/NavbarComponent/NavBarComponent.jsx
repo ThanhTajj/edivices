@@ -46,7 +46,15 @@ const NavBarComponent = () => {
         <div>
             <WrapperLableText>Lable</WrapperLableText>
             <WrapperContent>
-                {renderContent('text', ['CPU', 'Mainboard', 'RAM'])}
+                {renderContent('text', ['Tủ lạnh', 'TV', 'Máy giặt'])}
+            </WrapperContent>
+            <WrapperLableText>Giá tiền</WrapperLableText>
+            <WrapperContent>
+                {renderContent('price', ['Dưới 4tr', 'Từ 4 - 15tr', 'Trên 15tr'])}
+            </WrapperContent>
+            <WrapperLableText>Đánh giá</WrapperLableText>
+            <WrapperContent>
+                {renderContent('star', [3, 4, 5])}
             </WrapperContent>
         </div>
     )
