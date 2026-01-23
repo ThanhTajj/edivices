@@ -91,10 +91,10 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
             <ButttonInputSearch
               size="large"
               bordered={false}
-              textbutton="Tìm kiếm"
-              placeholder="input search text"
+              placeholder="Bạn muốn tìm sản phẩm gì?"
               onChange={onSearch}
-              backgroundColorButton="#0046ad"
+              backgroundColorButton="#ffc400"
+              colorButton="#0046ad"
             />
           </Col>
         )}

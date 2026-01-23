@@ -13,12 +13,13 @@ import { useState } from 'react'
 import Loading from '../../components/LoadingComponent/Loading'
 import { useDebounce } from '../../hooks/useDebounce'
 import { useEffect } from 'react'
+import ProductSection from '../../components/ProductSection/ProductSection'
 
 const HomePage = () => {
   const searchProduct = useSelector((state) => state?.product?.search)
   const searchDebounce = useDebounce(searchProduct, 500)
   const [loading, setLoading] = useState(false)
-  const [limit, setLimit] = useState(6)
+  const [limit, setLimit] = useState(20)
   const [typeProducts, setTypeProducts] = useState([])
 
   const fetchProductAll = async (context) => {
@@ -56,26 +57,17 @@ const HomePage = () => {
       </div>
       <div className='body' style={{ width: '100%', backgroundColor: '#ececec', paddingTop: '20px' }}>
         <div id="container" style={{ height: '1000px', width: '1270px', margin: '0 auto', backgroundColor: '#ffffff' }}>
+
           <SliderComponent arrImages={[slider1, slider2, slider3]} />
-          <WrapperProducts>
-            {products?.data?.map((product) => {
-              return (
-                <CardComponent
-                  key={product._id}
-                  countInStock={product.countInStock}
-                  description={product.description}
-                  image={product.image}
-                  name={product.name}
-                  price={product.price}
-                  rating={product.rating}
-                  type={product.type}
-                  selled={product.selled}
-                  discount={product.discount}
-                  id={product._id}
-                />
-              )
-            })}
-          </WrapperProducts>
+          {typeProducts.map((item) => {
+            return (
+              <ProductSection
+                key={item}
+                title={item}
+                products={products?.data?.filter(product => product.type === item)}
+              />
+            )
+          })}
           <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
             <WrapperButtonMore
               textbutton={isPreviousData ? 'Load more' : "Xem thêm"} type="outline" styleButton={{

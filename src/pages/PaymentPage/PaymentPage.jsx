@@ -158,8 +158,10 @@ const PaymentPage = () => {
       })
     } else if (isError) {
       message.error()
+    } else if (isSuccess && dataAdd?.status === 'ERR') {
+      message.error(dataAdd?.message)
     }
-  }, [isSuccess, isError])
+  }, [isSuccess, isError, dataAdd])
 
   const handleCancleUpdate = () => {
     setStateUserDetails({

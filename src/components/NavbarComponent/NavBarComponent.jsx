@@ -1,61 +1,43 @@
-import { Checkbox, Col, Rate, Row } from 'antd'
+import { Checkbox, Radio, Rate } from 'antd'
 import React from 'react'
-import { WrapperContent, WrapperLableText, WrapperTextPrice, WrapperTextValue } from './style'
+import { wrapperContent, WrapperLableText, WrapperTextValue } from './style'
 
-const NavBarComponent = () => {
-    const onChange = () => { }
-    const renderContent = (type, options) => {
-        switch (type) {
-            case 'text':
-                return options.map((option) => {
-                    return (
-                        <WrapperTextValue>{option}</WrapperTextValue>
-                    )
-                })
-            case 'checkbox':
-                return (
-                    <Checkbox.Group style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px' }} onChange={onChange}>
-                        {options.map((option) => {
-                            return (
-                                <Checkbox style={{ marginLeft: 0 }} value={option.value}>{option.label}</Checkbox>
-                            )
-                        })}
-                    </Checkbox.Group>
-                )
-            case 'star':
-                return options.map((option) => {
-                    return (
-                        <div style={{ dispaly: 'flex' }}>
-                            <Rate style={{ fontSize: '12px' }} disabled defaultValue={option} />
-                            <span> {`tu ${option}  sao`}</span>
-                        </div>
-                    )
-                })
-            case 'price':
-                return options.map((option) => {
-                    return (
-                        <WrapperTextPrice>{option}</WrapperTextPrice>
-                    )
-                })
-            default:
-                return {}
-        }
+const NavBarComponent = ({ onChange, filters, brands = [] }) => {
+
+    const onChangePrice = (e) => {
+        onChange('price', e.target.value)
+    }
+
+    const onChangeBrand = (checkedValues) => {
+        onChange('brand', checkedValues)
     }
 
     return (
-        <div>
-            <WrapperLableText>Lable</WrapperLableText>
-            <WrapperContent>
-                {renderContent('text', ['Tủ lạnh', 'TV', 'Máy giặt'])}
-            </WrapperContent>
-            <WrapperLableText>Giá tiền</WrapperLableText>
-            <WrapperContent>
-                {renderContent('price', ['Dưới 4tr', 'Từ 4 - 15tr', 'Trên 15tr'])}
-            </WrapperContent>
-            <WrapperLableText>Đánh giá</WrapperLableText>
-            <WrapperContent>
-                {renderContent('star', [3, 4, 5])}
-            </WrapperContent>
+        <div style={{ backgroundColor: '#fff', padding: '10px', borderRadius: '4px' }}>
+            <WrapperLableText>KHOẢNG GIÁ</WrapperLableText>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <Radio.Group onChange={onChangePrice} value={filters?.price}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <Radio value="all">Tất cả</Radio>
+                        <Radio value="under10">Dưới 10 triệu</Radio>
+                        <Radio value="10to20">Từ 10 triệu - 20 triệu</Radio>
+                        <Radio value="above20">Trên 20 triệu</Radio>
+                    </div>
+                </Radio.Group>
+            </div>
+
+            <WrapperLableText>THƯƠNG HIỆU</WrapperLableText>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <Checkbox.Group style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px' }} onChange={onChangeBrand} value={filters?.brand}>
+                    {brands.length > 0 ? (
+                        brands.map((brand) => (
+                            <Checkbox key={brand} value={brand} style={{ marginLeft: 0 }}>{brand}</Checkbox>
+                        ))
+                    ) : (
+                        <div style={{ fontSize: '13px', color: '#888' }}>Chưa có thương hiệu</div>
+                    )}
+                </Checkbox.Group>
+            </div>
         </div>
     )
 }

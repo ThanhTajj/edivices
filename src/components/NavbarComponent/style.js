@@ -1,11 +1,12 @@
 import styled from "styled-components";
 
 export const WrapperLableText = styled.h4`
-    color: rgb(56, 56, 61);
+    color: #0057D9;
     font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 10px;
-    margin-top: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    margin-top: 10px;
+    text-transform: uppercase;
 `
 
 export const WrapperTextValue = styled.span`
