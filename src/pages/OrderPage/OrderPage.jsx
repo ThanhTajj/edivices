@@ -114,14 +114,18 @@ const OrderPage = () => {
   }, [order])
 
   const diliveryPriceMemo = useMemo(() => {
-    if (priceMemo >= 20000 && priceMemo < 500000) {
-      return 10000
-    } else if (priceMemo >= 500000 || order?.orderItemsSlected?.length === 0) {
+    if (!order?.orderItemsSlected?.length) {
       return 0
-    } else {
-      return 20000
     }
-  }, [priceMemo])
+
+    if (priceMemo < 200000) {
+      return 20000
+    } else if (priceMemo <= 500000) {
+      return 10000
+    } else {
+      return 0
+    }
+  }, [priceMemo, order?.orderItemsSlected?.length])
 
   const totalPriceMemo = useMemo(() => {
     return Number(priceMemo) - Number(priceDiscountMemo) + Number(diliveryPriceMemo)

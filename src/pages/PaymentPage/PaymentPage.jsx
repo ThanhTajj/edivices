@@ -23,7 +23,7 @@ const PaymentPage = () => {
   const order = useSelector((state) => state.order)
   const user = useSelector((state) => state.user)
 
-  const [delivery, setDelivery] = useState('fast')
+  // const [delivery, setDelivery] = useState('fast')
   const [payment, setPayment] = useState('later_money')
   const navigate = useNavigate()
   const [sdkReady, setSdkReady] = useState(false)
@@ -150,7 +150,7 @@ const PaymentPage = () => {
       message.success('Đặt hàng thành công')
       navigate('/orderSuccess', {
         state: {
-          delivery,
+          // delivery,
           payment,
           orders: order?.orderItemsSlected,
           totalPriceMemo: totalPriceMemo
@@ -214,9 +214,9 @@ const PaymentPage = () => {
       [e.target.name]: e.target.value
     })
   }
-  const handleDilivery = (e) => {
-    setDelivery(e.target.value)
-  }
+  // const handleDilivery = (e) => {
+  //   setDelivery(e.target.value)
+  // }
 
   const handlePayment = (e) => {
     setPayment(e.target.value)
@@ -249,7 +249,7 @@ const PaymentPage = () => {
           <h3>Thanh toán</h3>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <WrapperLeft>
-              <WrapperInfo>
+              {/* <WrapperInfo>
                 <div>
                   <Lable>Chọn phương thức giao hàng</Lable>
                   <WrapperRadio onChange={handleDilivery} value={delivery}>
@@ -257,7 +257,7 @@ const PaymentPage = () => {
                     <Radio value="gojek"><span style={{ color: '#ea8500', fontWeight: 'bold' }}>GO_JEK</span> Giao hàng tiết kiệm</Radio>
                   </WrapperRadio>
                 </div>
-              </WrapperInfo>
+              </WrapperInfo> */}
               <WrapperInfo>
                 <div>
                   <Lable>Chọn phương thức thanh toán</Lable>

@@ -50,7 +50,7 @@ const DetailsOrderPage = () => {
           <WrapperInfoUser>
             <WrapperLabel>Hình thức giao hàng</WrapperLabel>
             <WrapperContentInfo>
-              <div className='delivery-info'><span className='name-delivery'>FAST </span>Giao hàng tiết kiệm</div>
+              {/* <div className='delivery-info'><span className='name-delivery'>FAST </span>Giao hàng tiết kiệm</div> */}
               <div className='delivery-fee'><span>Phí giao hàng: </span> {data?.shippingPrice}</div>
             </WrapperContentInfo>
           </WrapperInfoUser>

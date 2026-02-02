@@ -113,8 +113,22 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
               )}
               {user?.email ? (
                 <>
-                  <Popover content={content} trigger="click" open={isOpenPopup}>
-                    <div style={{ cursor: 'pointer', maxWidth: 120, overflow: 'hidden', textWrap: 'nowrap' }} onClick={() => setIsOpenPopup((prev) => !prev)}>{userName?.length ? userName : user?.email}</div>
+                  <Popover
+                    content={content}
+                    trigger="click"
+                    open={isOpenPopup}
+                    onOpenChange={(open) => setIsOpenPopup(open)}
+                  >
+                    <div
+                      style={{
+                        cursor: 'pointer',
+                        maxWidth: 120,
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {userName?.length ? userName : user?.email}
+                    </div>
                   </Popover>
                 </>
               ) : (

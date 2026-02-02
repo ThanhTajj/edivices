@@ -22,9 +22,9 @@ const OrderSucess = () => {
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <Card style={{ width: '100%', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
               <Descriptions title="Chi tiết đơn hàng" bordered column={1}>
-                <Descriptions.Item label="Phương thức giao hàng">
+                {/* <Descriptions.Item label="Phương thức giao hàng">
                   <span style={{ color: '#ea8500', fontWeight: 'bold' }}>{orderContant.delivery[state?.delivery]}</span> Giao hàng tiết kiệm
-                </Descriptions.Item>
+                </Descriptions.Item> */}
                 <Descriptions.Item label="Phương thức thanh toán">
                   {orderContant.payment[state?.payment]}
                 </Descriptions.Item>
