@@ -11,18 +11,21 @@ export const WrapperTypeProduct = styled.div`
 
 export const WrapperButtonMore = styled(ButtonComponent)`
     &:hover {
-        background-color: rgb(13, 92, 182) !important;
+        color: #fff;
+        background: #9255FD;
         span {
-            color:#fff;
+            color: #fff;
         }
     }
-    width:100%;
-    text-align:center;
+    width: 100%;
+    color: #9255FD;
+    text-align: center;
+    cursor: ${(props) => props.disabled ? 'not-allowed' : 'pointers'}
 `
 
 export const WrapperProducts = styled.div`
     display: flex;
-    gap: 20px;
-    margin-top: 20px;
-    flex-wrap:wrap;
+    gap: 100px;
+    margin-top:30px;
+    flex-wrap: wrap;
 `
