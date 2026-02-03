@@ -1,128 +1,145 @@
-import React, { Fragment } from 'react'
+import React, { useEffect, useState } from 'react'
+import { Col, Pagination, Row } from 'antd'
+import { useLocation, useParams, useSearchParams } from 'react-router-dom'
+
 import NavBarComponent from '../../components/NavBarComponent/NavBarComponent'
 import CardComponent from '../../components/CardComponent/CardComponent'
-import { Col, Pagination, Row } from 'antd'
-import { WrapperNavbar, WrapperProducts } from './style'
-import { useLocation } from 'react-router-dom'
-import * as ProductService from '../../services/ProductService'
-import { useEffect } from 'react'
-import { useState } from 'react'
 import Loading from '../../components/LoadingComponent/Loading'
-import { useSelector } from 'react-redux'
-import { useDebounce } from '../../hooks/useDebounce'
+import { WrapperNavbar, WrapperProducts } from './style'
+import * as ProductService from '../../services/ProductService'
 
 const TypeProductPage = () => {
-    const searchProduct = useSelector((state) => state?.product?.search)
-    const searchDebounce = useDebounce(searchProduct, 500)
+    const { type } = useParams()
+    const location = useLocation()
+    const [searchParams] = useSearchParams()
 
-    const { state } = useLocation()
+    const keyword = searchParams.get('keyword')
+    const isSearchPage = location.pathname === '/product/search'
+
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState(false)
     const [panigate, setPanigate] = useState({
         page: 0,
         limit: 10,
-        total: 1,
+        total: 0,
     })
-    const fetchProductType = async (type, page, limit) => {
-        setLoading(true)
-        const res = await ProductService.getProductType(type, page, limit)
-        if (res?.status == 'OK') {
-            setLoading(false)
-            setProducts(res?.data)
-            setPanigate({ ...panigate, total: res?.totalPage })
-        } else {
-            setLoading(false)
-        }
-    }
-
-    useEffect(() => {
-        if (state) {
-            // Check if state is just a string (type name) or an object
-            const type = typeof state === 'object' ? state.type : state
-            fetchProductType(type, panigate.page, panigate.limit)
-        }
-    }, [state, panigate.page, panigate.limit])
-
-    const onChange = (current, pageSize) => {
-        setPanigate({ ...panigate, page: current - 1, limit: pageSize })
-    }
-
 
     const [filters, setFilters] = useState({
         price: 'all',
         brand: []
     })
 
-    const handleFilterChange = (type, value) => {
-        setFilters(prev => ({
+    const fetchProducts = async () => {
+        setLoading(true)
+        let res
+
+        try {
+            if (isSearchPage && keyword) {
+                // 🔍 SEARCH
+                res = await ProductService.searchProduct(
+                    keyword,
+                    panigate.page,
+                    panigate.limit
+                )
+            } else if (type) {
+                // 📦 TYPE
+                res = await ProductService.getProductType(
+                    type,
+                    panigate.page,
+                    panigate.limit
+                )
+            }
+
+            if (res?.status === 'OK') {
+                setProducts(res.data || [])
+                setPanigate(prev => ({
+                    ...prev,
+                    total: res.total || 0
+                }))
+            }
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    // reset page khi đổi keyword / type
+    useEffect(() => {
+        setPanigate(prev => ({ ...prev, page: 0 }))
+    }, [keyword, type])
+
+    useEffect(() => {
+        fetchProducts()
+    }, [keyword, type, panigate.page, panigate.limit])
+
+    const onChange = (current, pageSize) => {
+        setPanigate(prev => ({
             ...prev,
-            [type]: value
+            page: current - 1,
+            limit: pageSize
         }))
     }
 
-    // Update filters from navigation state
-    useEffect(() => {
-        if (state?.priceRange) {
-            setFilters(prev => ({ ...prev, price: state.priceRange }))
-        }
-    }, [state])
+    const handleFilterChange = (key, value) => {
+        setFilters(prev => ({
+            ...prev,
+            [key]: value
+        }))
+    }
 
-    // Extract distinct brands from the fetched products
-    const distinctBrands = [...new Set(products?.map((p) => p.brand).filter((b) => b))]
+    const distinctBrands = [
+        ...new Set(products.map(p => p.brand).filter(Boolean))
+    ]
 
     return (
         <Loading isLoading={loading}>
             <div style={{ width: '100%', background: '#efefef', minHeight: 'calc(100vh - 64px)' }}>
-                <div style={{ width: '1270px', margin: '0 auto' }}>
-                    <Row style={{ flexWrap: 'nowrap', paddingTop: '10px' }}>
-                        <WrapperNavbar span={4} >
-                            <NavBarComponent onChange={handleFilterChange} filters={filters} brands={distinctBrands} />
+                <div style={{ width: '1310px', margin: '0 auto' }}>
+                    <Row style={{ flexWrap: 'nowrap', paddingTop: 10 }}>
+                        <WrapperNavbar span={4}>
+                            <NavBarComponent
+                                onChange={handleFilterChange}
+                                filters={filters}
+                                brands={distinctBrands}
+                            />
                         </WrapperNavbar>
-                        <Col span={20} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                            <WrapperProducts >
-                                {products?.filter((pro) => {
-                                    let matchesSearch = true;
-                                    let matchesPrice = true;
-                                    let matchesBrand = true;
 
-                                    if (searchDebounce !== '') {
-                                        matchesSearch = pro?.name?.toLowerCase()?.includes(searchDebounce?.toLowerCase());
-                                    }
+                        <Col span={20}>
+                            <WrapperProducts>
+                                {products
+                                    .filter(pro => {
+                                        let okPrice = true
+                                        let okBrand = true
 
-                                    // Price Filter
-                                    if (filters.price === 'under10') {
-                                        matchesPrice = pro.price < 10000000;
-                                    } else if (filters.price === '10to20') {
-                                        matchesPrice = pro.price >= 10000000 && pro.price < 20000000;
-                                    } else if (filters.price === 'above20') {
-                                        matchesPrice = pro.price >= 20000000;
-                                    }
+                                        if (filters.price === 'under1') {
+                                            okPrice = pro.price < 1000000
+                                        } else if (filters.price === '1to10') {
+                                            okPrice = pro.price >= 1000000 && pro.price < 10000000
+                                        } else if (filters.price === 'above10') {
+                                            okPrice = pro.price >= 10000000
+                                        }
 
-                                    // Brand Filter
-                                    if (filters.brand.length > 0) {
-                                        matchesBrand = filters.brand.includes(pro?.brand);
-                                    }
+                                        if (filters.brand.length > 0) {
+                                            okBrand = filters.brand.includes(pro.brand)
+                                        }
 
-                                    return matchesSearch && matchesPrice && matchesBrand;
-                                })?.map((product) => {
-                                    return (
+                                        return okPrice && okBrand
+                                    })
+                                    .map(product => (
                                         <CardComponent
                                             key={product._id}
-                                            countInStock={product.countInStock}
-                                            description={product.description}
-                                            image={product.image}
-                                            name={product.name}
-                                            price={product.price}
-                                            rating={product.rating}
-                                            type={product.type}
-                                            selled={product.selled}
-                                            discount={product.discount}
+                                            {...product}
                                             id={product._id}
                                         />
-                                    )
-                                })}
+                                    ))}
                             </WrapperProducts>
-                            <Pagination defaultCurrent={panigate.page + 1} total={panigate?.total} onChange={onChange} style={{ textAlign: 'center', marginTop: '10px' }} />
+
+                            <Pagination
+                                current={panigate.page + 1}
+                                pageSize={panigate.limit}
+                                total={panigate.total}
+                                onChange={onChange}
+                                style={{ textAlign: 'center', marginTop: 10, display: 'flex', justifyContent: 'center' }}
+                            />
                         </Col>
                     </Row>
                 </div>

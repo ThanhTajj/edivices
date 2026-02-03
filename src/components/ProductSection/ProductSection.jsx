@@ -23,9 +23,9 @@ const ProductSection = ({ title, products, filterOptions = [] }) => {
                         ))
                     ) : (
                         <>
-                            <FilterItem onClick={() => handleNavigate('under10')}>DƯỚI 10 TRIỆU</FilterItem>
-                            <FilterItem onClick={() => handleNavigate('10to20')}>TỪ 10 TRIỆU - 20 TRIỆU</FilterItem>
-                            <FilterItem onClick={() => handleNavigate('above20')}>TRÊN 20 TRIỆU</FilterItem>
+                            <FilterItem onClick={() => handleNavigate('under1')}>DƯỚI 1 TRIỆU</FilterItem>
+                            <FilterItem onClick={() => handleNavigate('1to10')}>TỪ 1 TRIỆU - 10 TRIỆU</FilterItem>
+                            <FilterItem onClick={() => handleNavigate('above10')}>TRÊN 10 TRIỆU</FilterItem>
                         </>
                     )}
                 </SectionFilters>

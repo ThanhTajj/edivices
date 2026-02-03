@@ -68,7 +68,6 @@ const SignInPage = () => {
   }
 
   const handleSignIn = () => {
-    console.log('logingloin')
     mutation.mutate({
       email,
       password

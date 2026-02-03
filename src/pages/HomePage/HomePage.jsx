@@ -16,8 +16,6 @@ import { useEffect } from 'react'
 import ProductSection from '../../components/ProductSection/ProductSection'
 
 const HomePage = () => {
-  const searchProduct = useSelector((state) => state?.product?.search)
-  const searchDebounce = useDebounce(searchProduct, 500)
   const [loading, setLoading] = useState(false)
   const [limit, setLimit] = useState(20)
   const [typeProducts, setTypeProducts] = useState([])
@@ -38,7 +36,7 @@ const HomePage = () => {
     }
   }
 
-  const { isLoading, data: products, isPreviousData } = useQuery(['products', limit, searchDebounce], fetchProductAll, { retry: 3, retryDelay: 1000, keepPreviousData: true })
+  const { isLoading, data: products, isPreviousData } = useQuery(['products', limit], fetchProductAll, { retry: 3, retryDelay: 1000, keepPreviousData: true })
 
   useEffect(() => {
     fetchAllTypeProduct()
@@ -46,7 +44,7 @@ const HomePage = () => {
 
   return (
     <Loading isLoading={isLoading || loading}>
-      <div style={{ width: '1270px', margin: '0 auto' }}>
+      <div style={{ width: '1310px', margin: '0 auto' }}>
         <WrapperTypeProduct>
           {typeProducts.map((item) => {
             return (
@@ -56,8 +54,7 @@ const HomePage = () => {
         </WrapperTypeProduct>
       </div>
       <div className='body' style={{ width: '100%', backgroundColor: '#ececec', paddingTop: '20px' }}>
-        <div id="container" style={{ height: '1000px', width: '1270px', margin: '0 auto', backgroundColor: '#ffffff' }}>
-
+        <div id="container" style={{ height: 'auto', width: '1310px', margin: '0 auto', backgroundColor: '#ffffff', padding: '20px' }}>
           <SliderComponent arrImages={[slider1, slider2, slider3]} />
           {typeProducts.map((item) => {
             return (

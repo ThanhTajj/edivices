@@ -19,9 +19,9 @@ const NavBarComponent = ({ onChange, filters, brands = [] }) => {
                 <Radio.Group onChange={onChangePrice} value={filters?.price}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         <Radio value="all">Tất cả</Radio>
-                        <Radio value="under10">Dưới 10 triệu</Radio>
-                        <Radio value="10to20">Từ 10 triệu - 20 triệu</Radio>
-                        <Radio value="above20">Trên 20 triệu</Radio>
+                        <Radio value="under1">Dưới 1 triệu</Radio>
+                        <Radio value="1to10">Từ 1 triệu - 10 triệu</Radio>
+                        <Radio value="above10">Trên 10 triệu</Radio>
                     </div>
                 </Radio.Group>
             </div>

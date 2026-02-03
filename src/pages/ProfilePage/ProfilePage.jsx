@@ -79,7 +79,7 @@ const ProfilePage = () => {
 
     }
     return (
-        <div style={{ width: '1270px', margin: '0 auto', height: '500px' }}>
+        <div style={{ width: '1310px', margin: '0 auto', height: '500px' }}>
             <WrapperHeader>Thông tin người dùng</WrapperHeader>
             <Loading isLoading={isLoading}>
                 <WrapperContentProfile>

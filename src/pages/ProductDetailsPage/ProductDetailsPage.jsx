@@ -8,7 +8,7 @@ const ProductDetailsPage = () => {
   const navigate = useNavigate()
   return (
     <div style={{ width: '100%', background: '#efefef', height: '100%' }}>
-      <div style={{ width: '1270px', height: '100%', margin: '0 auto' }} >
+      <div style={{ width: '1310px', height: '100%', margin: '0 auto' }} >
         <Breadcrumb
           style={{ padding: '16px 0', fontSize: '16px' }}
           items={[

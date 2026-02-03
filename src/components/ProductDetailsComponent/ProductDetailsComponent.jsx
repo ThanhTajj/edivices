@@ -221,7 +221,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
                         ? "https://developers.facebook.com/docs/plugins/comments#configurator"
                         : window.location.href
                     }
-                    width="1270"
+                    width="1310"
                 />
             </Row >
 

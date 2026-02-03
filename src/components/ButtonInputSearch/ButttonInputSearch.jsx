@@ -29,6 +29,7 @@ const ButttonInputSearch = (props) => {
         icon={<SearchOutlined style={{ color: colorButton }} />}
         textbutton={textbutton}
         styleTextButton={{ color: colorButton }}
+        onClick={props.onClickButton}
       />
     </div>
   )

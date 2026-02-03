@@ -14,8 +14,8 @@ import { resetUser } from '../../redux/slides/userSlide'
 import { useState } from 'react';
 import Loading from '../LoadingComponent/Loading';
 import { useEffect } from 'react';
-import { searchProduct } from '../../redux/slides/productSlide';
-
+import SearchBoxComponent from '../SearchBoxComponent/SearchBoxComponent';
+import { useRef } from 'react'
 
 const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const navigate = useNavigate()
@@ -23,10 +23,12 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const dispatch = useDispatch()
   const [userName, setUserName] = useState('')
   const [userAvatar, setUserAvatar] = useState('')
-  const [search, setSearch] = useState('')
   const [isOpenPopup, setIsOpenPopup] = useState(false)
   const order = useSelector((state) => state.order)
   const [loading, setLoading] = useState(false)
+  const [showSearch, setShowSearch] = useState(false)
+  const searchRef = useRef(null)
+
   const handleNavigateLogin = () => {
     navigate('/sign-in')
   }
@@ -44,6 +46,17 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
     setUserAvatar(user?.avatar)
     setLoading(false)
   }, [user?.name, user?.avatar])
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShowSearch(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const content = (
     <div>
@@ -73,13 +86,8 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
       handleLogout()
     }
     setIsOpenPopup(false)
-  }
-
-  const onSearch = (e) => {
-    setSearch(e.target.value)
-    dispatch(searchProduct(e.target.value))
-  }
-
+  };
+  
   return (
     <div style={{ heiht: '100%', width: '100%', display: 'flex', background: '#0057D9', justifyContent: 'center' }}>
       <WrapperHeader style={{ justifyContent: isHiddenSearch && isHiddenSearch ? 'space-between' : 'unset' }}>
@@ -88,14 +96,12 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
         </Col>
         {!isHiddenSearch && (
           <Col span={11}>
-            <ButttonInputSearch
-              size="large"
-              bordered={false}
-              placeholder="Bạn muốn tìm sản phẩm gì?"
-              onChange={onSearch}
-              backgroundColorButton="#ffc400"
-              colorButton="#0046ad"
-            />
+            <div style={{ position: 'relative' }} ref={searchRef}>
+              <SearchBoxComponent
+                show={showSearch}
+                setShow={setShowSearch}
+              />
+            </div>
           </Col>
         )}
         <Col span={8} style={{ display: 'flex', gap: '54px', alignItems: 'center', marginLeft: '40px' }}>

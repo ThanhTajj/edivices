@@ -13,7 +13,7 @@ const OrderSucess = () => {
   return (
     <div style={{ background: '#f5f6fa', width: '100%', minHeight: '100vh', paddingBottom: '40px' }}>
       <Loading isLoading={false}>
-        <div style={{ height: '100%', width: '1270px', margin: '0 auto', paddingTop: '20px' }}>
+        <div style={{ height: '100%', width: '1310px', margin: '0 auto', paddingTop: '20px' }}>
           <Result
             status="success"
             title="Đặt hàng thành công!"

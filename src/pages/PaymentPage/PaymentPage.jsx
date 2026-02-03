@@ -245,7 +245,7 @@ const PaymentPage = () => {
   return (
     <div style={{ background: '#f5f5fa', with: '100%', height: '100vh' }}>
       <Loading isLoading={isLoadingAddOrder}>
-        <div style={{ height: '100%', width: '1270px', margin: '0 auto' }}>
+        <div style={{ height: '100%', width: '1310px', margin: '0 auto' }}>
           <h3>Thanh toán</h3>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <WrapperLeft>
