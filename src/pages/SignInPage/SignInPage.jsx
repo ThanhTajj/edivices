@@ -6,10 +6,10 @@ import imageLogo from '../../assets/images/logo-login.png'
 import { Image } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import * as UserService from '../../services/UserService'
-import { useMutationHook } from '../../hooks/useMutationHook'
-import Loading from '../../components/LoadingComponent/LoadingComponent'
+import { useMutationHooks } from '../../hooks/useMutationHook'
+import Loading from '../../components/LoadingComponent/Loading'
 import * as message from '../../components/Message/Message'
-import { jwtDecode } from 'jwt-decode'
+import jwtDecode from 'jwt-decode'
 import { useDispatch } from 'react-redux'
 import { updateUser } from '../../redux/slides/userSlide'
 
@@ -20,7 +20,7 @@ const SignInPage = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const mutation = useMutationHook(
+  const mutation = useMutationHooks(
     data => UserService.loginUser(data)
   )
 
@@ -77,20 +77,20 @@ const SignInPage = () => {
       >
         <WrapperContainerLeft>
           <h1>Xin chào,</h1>
-          <p>Đăng nhập hoặc tạo tài khoản</p>
+          <p style={{ fontSize: '13px'}}>Đăng nhập hoặc tạo tài khoản</p>
 
           <InputForm
             style={{ marginBottom: '10px' }}
             placeholder="abc@gmail.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(value) => setEmail(value)}
           />
 
           <InputForm
             placeholder="password"
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(value) => setPassword(value)}
           />
 
           {data?.status === 'ERR' && <span style={{ color: 'red'}}>{data?.message}</span>}
@@ -109,11 +109,11 @@ const SignInPage = () => {
               styleTextButton={{ color: '#fff', fontSize: '15px' }}
             />
           </Loading>
-          <p>
+          <p style={{margin: "15px 0 0 0"}}>
             <WrapperTextLight>Quên mật khẩu</WrapperTextLight>
           </p>
 
-          <p>
+          <p style={{ fontSize: '13px', margin: "5px 0 0 0" }}>
             Chưa có tài khoản?{' '}
             <WrapperTextLight onClick={handleNavigateSignUp}>
               Tạo tài khoản
@@ -129,7 +129,6 @@ const SignInPage = () => {
             height="203px"
             width="203px"
           />
-          <h4>Mua sắm tại EDIVCES</h4>
         </WrapperContainerRight>
       </div>
     </div>

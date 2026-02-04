@@ -1,8 +1,8 @@
 import { useMutation } from "@tanstack/react-query"
 
-export const useMutationHook = (fnCallBack) => {
+export const useMutationHooks = (fnCallback) => {
     const mutation = useMutation({
-        mutationFn: fnCallBack
+        mutationFn: fnCallback
     })
     return mutation
 }
