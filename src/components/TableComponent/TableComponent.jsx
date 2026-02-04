@@ -8,10 +8,33 @@ const TableComponent = (props) => {
   const { selectionType = 'checkbox', data:dataSource = [], isLoading = false, columns = [], handleDelteMany } = props
   const [rowSelectedKeys, setRowSelectedKeys] = useState([])
   const newColumnExport = useMemo(() => {
-    const arr = columns?.filter((col) => col.dataIndex !== 'action')
-    return arr
+    return columns
+      .filter(col => col.dataIndex && col.dataIndex !== 'action')
+      .map(col => {
+        if (col.dataIndex === 'image') {
+          return {
+            title: 'Image URL',
+            dataIndex: 'image'
+          }
+        }
+        return {
+          title: col.title,
+          dataIndex: col.dataIndex
+        }
+      })
   }, [columns])
-  
+
+  const dataExport = useMemo(() => {
+    return dataSource.map(item => ({
+      ...item,
+
+      image: item.image || '',
+
+      description: item.description || '',
+      discount: item.discount || 0
+    }))
+  }, [dataSource])
+
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
       setRowSelectedKeys(selectedRowKeys)
@@ -22,18 +45,20 @@ const TableComponent = (props) => {
     //   name: record.name,
     // }),
   };
+  
   const handleDeleteAll = () => {
     handleDelteMany(rowSelectedKeys)
   }
+
   const exportExcel = () => {
     const excel = new Excel();
     excel
-      .addSheet("test")
+      .addSheet("Products")
       .addColumns(newColumnExport)
-      .addDataSource(dataSource, {
+      .addDataSource(dataExport, {
         str2Percent: true
       })
-      .saveAs("Excel.xlsx");
+      .saveAs("Products.xlsx");
   };
   
   return (

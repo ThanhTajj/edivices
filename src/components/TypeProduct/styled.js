@@ -8,6 +8,8 @@ export const WrapperType = styled.div`
   padding: 8px 16px;
   font-weight: 500;
   transition: all 0.3s;
+  font-size: 13px;
+  margin-top: 10px;
   &:hover {
     background-color: var(--primary-color);
     color: #fff;

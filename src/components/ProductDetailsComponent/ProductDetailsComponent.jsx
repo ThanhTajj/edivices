@@ -209,7 +209,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
                                     borderRadius: '4px'
                                 }}
                                 onClick={handleAddOrderProduct}
-                                textbutton={'Thêm vào giỏ hàng'}
+                                textButton={'Thêm vào giỏ hàng'}
                                 styleTextButton={{ color: '#fff', fontSize: '15px', fontWeight: '700' }}
                             ></ButtonComponent>
                             {errorLimitOrder && <div style={{ color: 'red' }}>San pham het hang</div>}

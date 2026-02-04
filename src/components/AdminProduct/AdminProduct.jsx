@@ -309,12 +309,45 @@ const AdminProduct = () => {
       },
     },
     {
+      title: 'In Stock',
+      dataIndex: 'countInStock',
+      sorter: (a, b) => a.countInStock - b.countInStock,
+    },
+    {
       title: 'Type',
       dataIndex: 'type',
     },
     {
       title: 'Brand',
       dataIndex: 'brand',
+    },
+    {
+      title: 'Discount (%)',
+      dataIndex: 'discount',
+      sorter: (a, b) => a.discount - b.discount,
+    },
+    {
+      title: 'Image',
+      dataIndex: 'image',
+      render: (image) => (
+        <img
+          src={image}
+          alt="product"
+          style={{
+            width: '50px',
+            height: '50px',
+            objectFit: 'cover',
+            borderRadius: '6px'
+          }}
+        />
+      )
+    },
+    {
+      title: 'Description',
+      dataIndex: 'description',
+      render: (text) => (
+        <span>{text?.length > 50 ? text.slice(0, 50) + '...' : text}</span>
+      )
     },
     {
       title: 'Action',
@@ -522,8 +555,6 @@ const AdminProduct = () => {
             >
               <Select
                 name="type"
-                // defaultValue="lucy"
-                // style={{ width: 120 }}
                 value={stateProduct.type}
                 onChange={handleChangeSelect}
                 options={renderOptions(typeProduct?.data?.data)}
@@ -562,7 +593,7 @@ const AdminProduct = () => {
             <Form.Item
               label="Description"
               name="description"
-              rules={[{ required: true, message: 'Please input your count description!' }]}
+              rules={[{ required: false, message: 'Please input your count description!' }]}
             >
               <InputComponent value={stateProduct.description} onChange={handleOnchange} name="description" />
             </Form.Item>
@@ -670,7 +701,7 @@ const AdminProduct = () => {
             <Form.Item
               label="Description"
               name="description"
-              rules={[{ required: true, message: 'Please input your count description!' }]}
+              rules={[{ required: false, message: 'Please input your count description!' }]}
             >
               <InputComponent value={stateProductDetails.description} onChange={handleOnchangeDetails} name="description" />
             </Form.Item>
