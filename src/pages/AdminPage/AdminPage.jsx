@@ -34,13 +34,11 @@ const AdminPage = () => {
 
   const getAllProducts = async () => {
     const res = await ProductService.getAllProduct()
-    console.log('res1', res)
     return {data: res?.data, key: 'products'}
   }
 
   const getAllUsers = async () => {
     const res = await UserService.getAllUser(user?.access_token)
-    console.log('res', res)
     return {data: res?.data, key: 'users'}
   }
 
@@ -92,17 +90,16 @@ const AdminPage = () => {
   const handleOnCLick = ({ key }) => {
     setKeySelected(key)
   }
-  console.log('memoCount', memoCount)
   return (
     <>
       <HeaderComponent isHiddenSearch isHiddenCart />
-      <div style={{ display: 'flex',overflowX: 'hidden' }}>
+      <div style={{ display: 'flex',overflowX: 'hidden', minHeight: '100vh' }}>
         <Menu
           mode="inline"
           style={{
             width: 256,
             boxShadow: '1px 1px 2px #ccc',
-            height: '100vh'
+            minHeight: '100vh'
           }}
           items={items}
           onClick={handleOnCLick}

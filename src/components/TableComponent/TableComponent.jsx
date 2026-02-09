@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import Loading from '../../components/LoadingComponent/Loading'
 import { Excel } from "antd-table-saveas-excel";
 import { useMemo } from 'react';
+import { TableButtonWrapper } from './style';
 
 const TableComponent = (props) => {
   const { selectionType = 'checkbox', data:dataSource = [], isLoading = false, columns = [], handleDelteMany } = props
@@ -10,25 +11,19 @@ const TableComponent = (props) => {
   const newColumnExport = useMemo(() => {
     return columns
       .filter(col => col.dataIndex && col.dataIndex !== 'action')
-      .map(col => {
-        if (col.dataIndex === 'image') {
-          return {
-            title: 'Image URL',
-            dataIndex: 'image'
-          }
-        }
-        return {
-          title: col.title,
-          dataIndex: col.dataIndex
-        }
-      })
+      .map(col => ({
+        title: col.title,
+        dataIndex: col.dataIndex
+      }))
   }, [columns])
 
   const dataExport = useMemo(() => {
     return dataSource.map(item => ({
       ...item,
 
-      image: item.image || '',
+      image: item.image?.startsWith('data:')
+        ? 'Base64 image (not exported)'
+        : item.image || '',
 
       description: item.description || '',
       discount: item.discount || 0
@@ -39,11 +34,6 @@ const TableComponent = (props) => {
     onChange: (selectedRowKeys, selectedRows) => {
       setRowSelectedKeys(selectedRowKeys)
     },
-    // getCheckboxProps: (record) => ({
-    //   disabled: record.name === 'Disabled User',
-    //   // Column configuration not to be checked
-    //   name: record.name,
-    // }),
   };
   
   const handleDeleteAll = () => {
@@ -53,30 +43,29 @@ const TableComponent = (props) => {
   const exportExcel = () => {
     const excel = new Excel();
     excel
-      .addSheet("Products")
+      .addSheet("exported data")
       .addColumns(newColumnExport)
-      .addDataSource(dataExport, {
-        str2Percent: true
-      })
-      .saveAs("Products.xlsx");
+      .addDataSource(dataExport)
+      .saveAs("Excel.xlsx");
   };
   
   return (
     <Loading isLoading={isLoading}>
+      <TableButtonWrapper onClick={exportExcel}>Export Excel</TableButtonWrapper>
       {!!rowSelectedKeys.length && (
         <div style={{
           background: '#1d1ddd',
           color: '#fff',
           fontWeight: 'bold',
           padding: '10px',
-          cursor: 'pointer'
+          cursor: 'pointer',
+          width: '100px',
         }}
           onClick={handleDeleteAll}
         >
-          Xóa tất cả
+          Xóa đã chọn ({rowSelectedKeys.length})
         </div>
       )}
-      <button onClick={exportExcel}>Export Excel</button>
       <Table
         rowSelection={{
           type: selectionType,

@@ -80,6 +80,7 @@ export const WrapperItemOrderInfo = styled.div`
   border-top-left-radius: 6px;
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
 `
 

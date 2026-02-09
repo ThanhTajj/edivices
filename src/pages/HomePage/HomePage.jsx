@@ -65,7 +65,7 @@ const HomePage = () => {
               />
             )
           })}
-          <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+          {/* <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
             <WrapperButtonMore
               textButton={isPreviousData ? 'Load more' : "Xem thêm"} type="outline" styleButton={{
                 border: `1px solid ${products?.total === products?.data?.length ? '#f5f5f5' : '#0057D9'}`, color: `${products?.total === products?.data?.length ? '#f5f5f5' : '#0057D9'}`,
@@ -75,7 +75,7 @@ const HomePage = () => {
               styleTextButton={{ fontWeight: 500, color: products?.total === products?.data?.length && '#fff' }}
               onClick={() => setLimit((prev) => prev + 6)}
             />
-          </div>
+          </div> */}
         </div>
       </div>
     </Loading>

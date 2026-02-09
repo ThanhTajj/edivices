@@ -15,6 +15,7 @@ import { useQuery } from '@tanstack/react-query'
 import DrawerComponent from '../DrawerComponent/DrawerComponent'
 import { useSelector } from 'react-redux'
 import ModalComponent from '../ModalComponent/ModalComponent'
+import ImportProductExcel from '../ImportExcelComponent/ImportExcelComponent'
 
 const AdminProduct = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -355,9 +356,12 @@ const AdminProduct = () => {
       render: renderAction
     },
   ];
-  const dataTable = products?.data?.length && products?.data?.map((product) => {
-    return { ...product, key: product._id }
-  })
+  const dataTable = Array.isArray(products?.data)
+    ? products.data.map((product) => ({
+        ...product,
+        key: product._id,
+      }))
+    : []
 
   useEffect(() => {
     if (isSuccess && data?.status === 'OK') {
@@ -517,6 +521,10 @@ const AdminProduct = () => {
   return (
     <div>
       <WrapperHeader>Quản lý sản phẩm</WrapperHeader>
+      <ImportProductExcel
+        token={user?.access_token}
+        onSuccess={() => queryProduct.refetch()}
+      />
       <div style={{ marginTop: '10px' }}>
         <Button style={{ height: '150px', width: '150px', borderRadius: '6px', borderStyle: 'dashed' }} onClick={() => setIsModalOpen(true)}><PlusOutlined style={{ fontSize: '60px' }} /></Button>
       </div>

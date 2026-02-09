@@ -5,8 +5,9 @@ import { useLocation, useParams, useSearchParams } from 'react-router-dom'
 import NavBarComponent from '../../components/NavBarComponent/NavBarComponent'
 import CardComponent from '../../components/CardComponent/CardComponent'
 import Loading from '../../components/LoadingComponent/Loading'
-import { WrapperNavbar, WrapperProducts } from './style'
+import { WrapperNavbar, WrapperProducts, WrapperTypeProduct } from './style'
 import * as ProductService from '../../services/ProductService'
+import TypeProduct from '../../components/TypeProduct/TypeProduct'
 
 const TypeProductPage = () => {
     const { type } = useParams()
@@ -29,20 +30,31 @@ const TypeProductPage = () => {
         brand: []
     })
 
+    const [typeProducts, setTypeProducts] = useState([])
+    
+    const fetchAllTypeProduct = async () => {
+    const res = await ProductService.getAllTypeProduct()
+    if (res?.status === 'OK') {
+        setTypeProducts(res?.data)
+    }
+    }
+
+    useEffect(() => {
+    fetchAllTypeProduct()
+    }, [])
+
     const fetchProducts = async () => {
         setLoading(true)
         let res
 
         try {
             if (isSearchPage && keyword) {
-                // 🔍 SEARCH
                 res = await ProductService.searchProduct(
                     keyword,
                     panigate.page,
                     panigate.limit
                 )
             } else if (type) {
-                // 📦 TYPE
                 res = await ProductService.getProductType(
                     type,
                     panigate.page,
@@ -62,7 +74,6 @@ const TypeProductPage = () => {
         }
     }
 
-    // reset page khi đổi keyword / type
     useEffect(() => {
         setPanigate(prev => ({ ...prev, page: 0 }))
     }, [keyword, type])
@@ -93,6 +104,17 @@ const TypeProductPage = () => {
     return (
         <Loading isLoading={loading}>
             <div style={{ width: '100%', background: '#efefef', minHeight: 'calc(100vh - 64px)' }}>
+                <div style={{background:'#f4f6f8', width:'100%', height: '54px'}}>
+                    <div style={{ width: '1310px', margin: '0 auto', backgroundColor: '#f4f6f8' }}>
+                        <WrapperTypeProduct>
+                            {typeProducts.map((item) => {
+                                return (
+                                    <TypeProduct style={{backgroundColor:'none', width: '100%'}} name={item} key={item} />
+                                )
+                            })}
+                        </WrapperTypeProduct>
+                    </div>
+                </div>
                 <div style={{ width: '1310px', margin: '0 auto' }}>
                     <Row style={{ flexWrap: 'nowrap', paddingTop: 10 }}>
                         <WrapperNavbar span={4}>

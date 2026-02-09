@@ -53,7 +53,6 @@ const SignInPage = () => {
       email,
       password
     })
-    console.log('email:', email, password)
   }
 
   return (
