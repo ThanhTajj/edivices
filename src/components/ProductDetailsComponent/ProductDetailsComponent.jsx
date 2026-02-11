@@ -151,7 +151,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
                         product: productDetails?._id,
                         discount: productDetails?.discount,
                         countInstock: productDetails?.countInStock
-                    }
+                    }, userId: user.id
                 }))
             } else {
                 setErrorLimitOrder(true)

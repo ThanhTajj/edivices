@@ -73,6 +73,11 @@ const TableComponent = (props) => {
         }}
         columns={columns}
         dataSource={dataSource}
+        pagination={{
+          pageSize: 6,
+          ...props.pagination,
+          hideOnSinglePage: true
+        }}
         {...props}
       />
     </Loading>

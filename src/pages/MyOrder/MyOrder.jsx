@@ -16,12 +16,15 @@ const MyOrderPage = () => {
   const navigate = useNavigate()
   const fetchMyOrder = async () => {
     const res = await OrderService.getOrderByUserId(state?.id, state?.token)
-    return res.data
+    console.log(res)
+    return res?.data || []
   }
   const user = useSelector((state) => state.user)
 
-  const queryOrder = useQuery({ queryKey: ['orders'], queryFn: fetchMyOrder }, {
-    enabled: state?.id && state?.token
+  const queryOrder = useQuery({
+    queryKey: ['orders'],
+    queryFn: fetchMyOrder,
+    enabled: !!state?.id && !!state?.token
   })
   const { isLoading, data } = queryOrder
 
@@ -61,7 +64,7 @@ const MyOrderPage = () => {
   }, [isErrorCancle, isSuccessCancel])
 
   const renderProduct = (data) => {
-    return data?.map((order) => {
+    return (Array.isArray(data) ? data : []).map((order) => {
       return <WrapperHeaderItem key={order?._id}>
         <img src={order?.image}
           style={{
@@ -90,7 +93,12 @@ const MyOrderPage = () => {
         <div style={{ height: '100%', width: '1310px', margin: '0 auto' }}>
           <h4>Đơn hàng của tôi</h4>
           <WrapperListOrder>
-            {data?.map((order) => {
+            {data?.length === 0 && (
+              <h2 style={{ textAlign: 'center', padding: '40px' }}>
+                Bạn chưa có đơn hàng nào
+              </h2>
+            )}
+            {(data || []).map((order) => {
               return (
                 <WrapperItemOrder key={order?._id}>
                   <WrapperStatus>

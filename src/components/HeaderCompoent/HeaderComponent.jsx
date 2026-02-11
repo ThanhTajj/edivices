@@ -16,6 +16,7 @@ import Loading from '../LoadingComponent/Loading';
 import { useEffect } from 'react';
 import SearchBoxComponent from '../SearchBoxComponent/SearchBoxComponent';
 import { useRef } from 'react'
+import { resetOrder } from '../../redux/slides/orderSlide';
 
 const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const navigate = useNavigate()
@@ -36,8 +37,11 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const handleLogout = async () => {
     setLoading(true)
     await UserService.logoutUser()
+    localStorage.removeItem('access_token')
     dispatch(resetUser())
+    dispatch(resetOrder())
     setLoading(false)
+    navigate('/')
   }
 
   useEffect(() => {

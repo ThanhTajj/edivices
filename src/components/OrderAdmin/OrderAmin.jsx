@@ -9,9 +9,9 @@ import ModalComponent from '../ModalComponent/ModalComponent'
 import { convertPrice, getBase64 } from '../../utils'
 import { useEffect } from 'react'
 import * as message from '../Message/Message'
-
+import { Switch } from 'antd'
 import * as OrderService from '../../services/OrderService'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons'
 import { useSelector } from 'react-redux'
 import { orderContant } from '../../contant'
@@ -123,16 +123,36 @@ const OrderAdmin = () => {
       ...getColumnSearchProps('address')
     },
     {
-      title: 'Paided',
+      title: 'Paid',
       dataIndex: 'isPaid',
-      sorter: (a, b) => a.isPaid.length - b.isPaid.length,
-      ...getColumnSearchProps('isPaid')
+      render: (value, record) => (
+        <Switch
+          checked={value}
+          onChange={(checked) => {
+            mutationUpdate.mutate({
+              id: record._id,
+              token: user?.access_token,
+              isPaid: checked,
+            })
+          }}
+        />
+      )
     },
     {
       title: 'Shipped',
       dataIndex: 'isDelivered',
-      sorter: (a, b) => a.isDelivered.length - b.isDelivered.length,
-      ...getColumnSearchProps('isDelivered')
+      render: (value, record) => (
+        <Switch
+          checked={value}
+          onChange={(checked) => {
+            mutationUpdate.mutate({
+              id: record._id,
+              token: user?.access_token,
+              isDelivered: checked,
+            })
+          }}
+        />
+      )
     },
     {
       title: 'Payment method',
@@ -149,7 +169,26 @@ const OrderAdmin = () => {
   ];
 
   const dataTable = orders?.data?.length && orders?.data?.map((order) => {
-    return { ...order, key: order._id, userName: order?.shippingAddress?.fullName, phone: order?.shippingAddress?.phone, address: order?.shippingAddress?.address, paymentMethod: orderContant.payment[order?.paymentMethod],isPaid: order?.isPaid ? 'TRUE' :'FALSE',isDelivered: order?.isDelivered ? 'TRUE' : 'FALSE', totalPrice: convertPrice(order?.totalPrice)}
+    return {
+      ...order,
+      key: order._id,
+      userName: order?.shippingAddress?.fullName,
+      phone: order?.shippingAddress?.phone,
+      address: order?.shippingAddress?.address,
+      paymentMethod: orderContant.payment[order?.paymentMethod],
+      totalPrice: convertPrice(order?.totalPrice)
+    }
+  })
+
+  const mutationUpdate = useMutation({
+    mutationFn: (data) => {
+      const { id, token, ...rests } = data
+      return OrderService.updateOrderStatus(id, token, rests)
+    },
+    onSuccess: () => {
+      message.success('Cập nhật thành công')
+      queryOrder.refetch()
+    }
   })
 
   return (

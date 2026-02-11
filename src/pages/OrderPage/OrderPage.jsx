@@ -6,7 +6,7 @@ import { DeleteOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons'
 import { WrapperInputNumber } from '../../components/ProductDetailsComponent/style';
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent';
 import { useDispatch, useSelector } from 'react-redux';
-import { decreaseAmount, increaseAmount, removeAllOrderProduct, removeOrderProduct, selectedOrder } from '../../redux/slides/orderSlide';
+import { decreaseAmount, increaseAmount, loadCart, removeAllOrderProduct, removeOrderProduct, selectedOrder } from '../../redux/slides/orderSlide';
 import { convertPrice } from '../../utils';
 import { useMemo } from 'react';
 import ModalComponent from '../../components/ModalComponent/ModalComponent';
@@ -22,7 +22,11 @@ import StepComponent from '../../components/StepConponent/StepComponent';
 const OrderPage = () => {
   const order = useSelector((state) => state.order)
   const user = useSelector((state) => state.user)
-
+  useEffect(() => {
+    if (user?.id) {
+      dispatch(loadCart({ userId: user.id }))
+    }
+  }, [user?.id])
   const [listChecked, setListChecked] = useState([])
   const [isOpenModalUpdateInfo, setIsOpenModalUpdateInfo] = useState(false)
   const [stateUserDetails, setStateUserDetails] = useState({
@@ -47,17 +51,17 @@ const OrderPage = () => {
   const handleChangeCount = (type, idProduct, limited) => {
     if (type === 'increase') {
       if (!limited) {
-        dispatch(increaseAmount({ idProduct }))
+        dispatch(increaseAmount({ idProduct, userId: user.id }))
       }
     } else {
       if (!limited) {
-        dispatch(decreaseAmount({ idProduct }))
+        dispatch(decreaseAmount({ idProduct, userId: user.id }))
       }
     }
   }
 
   const handleDeleteOrder = (idProduct) => {
-    dispatch(removeOrderProduct({ idProduct }))
+    dispatch(removeOrderProduct({ idProduct, userId: user.id }))
   }
 
   const handleOnchangeCheckAll = (e) => {
@@ -133,7 +137,7 @@ const OrderPage = () => {
 
   const handleRemoveAllOrder = () => {
     if (listChecked?.length > 1) {
-      dispatch(removeAllOrderProduct({ listChecked }))
+      dispatch(removeAllOrderProduct({ listChecked, userId: user.id }))
     }
   }
 

@@ -12,6 +12,7 @@ import * as message from '../../components/Message/Message'
 import jwtDecode from 'jwt-decode'
 import { useDispatch } from 'react-redux'
 import { updateUser } from '../../redux/slides/userSlide'
+import { loadCart } from '../../redux/slides/orderSlide'
 
 const SignInPage = () => {
   const [email, setEmail] = useState('')
@@ -41,7 +42,8 @@ const SignInPage = () => {
 
   const handleGetDetailsUser = async (id, token) => {
     const res = await UserService.getDetailsUser(id, token)
-    dispatch(updateUser({...res?.data, access_token: token}))
+    dispatch(updateUser({ ...res?.data, access_token: token }))
+    dispatch(loadCart({ userId: id }))
   }
 
   const handleNavigateSignUp = () => {

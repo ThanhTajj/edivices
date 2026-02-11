@@ -34,7 +34,6 @@ function App() {
   }
 
   UserService.axiosJWT.interceptors.request.use(async (config) => {
-    // Do something before request is sent
     const currentTime = new Date()
     const { decoded } = handleDecoded()
     let storageRefreshToken = localStorage.getItem('refresh_token')
