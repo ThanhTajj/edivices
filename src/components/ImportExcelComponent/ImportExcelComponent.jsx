@@ -114,7 +114,6 @@ const ImportProductExcel = ({ token, onSuccess }) => {
             onSuccess?.()
         }
       } catch (err) {
-        console.error('IMPORT ERROR:', err?.response?.data || err)
         message.error(err?.response?.data?.message || 'Import thất bại')
       }
     }

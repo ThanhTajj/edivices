@@ -1,5 +1,5 @@
 import { Menu } from 'antd'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { getItem } from '../../utils';
 import { UserOutlined, AppstoreOutlined, ShoppingCartOutlined } from '@ant-design/icons'
 import HeaderComponent from '../../components/HeaderCompoent/HeaderComponent';
@@ -9,21 +9,20 @@ import OrderAdmin from '../../components/OrderAdmin/OrderAmin';
 import * as OrderService from '../../services/OrderService'
 import * as ProductService from '../../services/ProductService'
 import * as UserService from '../../services/UserService'
-
-import CustomizedContent from './components/CustomizedContent';
 import { useSelector } from 'react-redux';
 import { useQueries } from '@tanstack/react-query';
-import { useMemo } from 'react';
-import Loading from '../../components/LoadingComponent/Loading';
+import { Navigate } from 'react-router-dom';
 
 const AdminPage = () => {
   const user = useSelector((state) => state?.user)
+  if (!user?.isAdmin) {
+    return <Navigate to="/" replace />
+  }
 
   const items = [
     getItem('Người dùng', 'users', <UserOutlined />),
     getItem('Sản phẩm', 'products', <AppstoreOutlined />),
     getItem('Đơn hàng', 'orders', <ShoppingCartOutlined />),
-    
   ];
 
   const [keySelected, setKeySelected] = useState('');
@@ -49,24 +48,6 @@ const AdminPage = () => {
       {queryKey: ['orders'], queryFn: getAllOrder, staleTime: 1000 * 60},
     ]
   })
-  const memoCount = useMemo(() => {
-    const result = {}
-    try {
-      if(queries) {
-        queries.forEach((query) => {
-          result[query?.data?.key] = query?.data?.data?.length
-        })
-      }
-    return result
-    } catch (error) {
-      return result
-    }
-  },[queries])
-  const COLORS = {
-   users: ['#e66465', '#9198e5'],
-   products: ['#a8c0ff', '#3f2b96'],
-   orders: ['#11998e', '#38ef7d'],
-  };
 
   const renderPage = (key) => {
     switch (key) {
@@ -90,6 +71,7 @@ const AdminPage = () => {
   const handleOnCLick = ({ key }) => {
     setKeySelected(key)
   }
+
   return (
     <>
       <HeaderComponent isHiddenSearch isHiddenCart />
@@ -105,11 +87,6 @@ const AdminPage = () => {
           onClick={handleOnCLick}
         />
         <div style={{ flex: 1, padding: '15px 0 15px 15px' }}>
-          <Loading isLoading={memoCount && Object.keys(memoCount) &&  Object.keys(memoCount).length !== 3}>
-            {!keySelected && (
-              <CustomizedContent data={memoCount} colors={COLORS} setKeySelected={setKeySelected} />
-            )}
-          </Loading>
           {renderPage(keySelected)}
         </div>
       </div>

@@ -8,6 +8,7 @@ import * as UserService from './services/UserService'
 import { useDispatch, useSelector } from 'react-redux'
 import { resetUser, updateUser } from './redux/slides/userSlide'
 import Loading from './components/LoadingComponent/Loading'
+import ScrollToTop from './components/ScrollToTop/ScrollToTop'
 
 function App() {
   const dispatch = useDispatch();
@@ -63,6 +64,7 @@ function App() {
     <div style={{height: '100vh', width: '100%'}}>
       <Loading isLoading={isLoading}>
         <Router>
+          <ScrollToTop />
           <Routes>
             {routes.map((route) => {
               const Page = route.page

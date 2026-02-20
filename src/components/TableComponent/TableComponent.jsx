@@ -17,8 +17,9 @@ const TableComponent = (props) => {
       }))
   }, [columns])
 
+  const safeData = Array.isArray(dataSource) ? dataSource : [];
   const dataExport = useMemo(() => {
-    return dataSource.map(item => ({
+    return safeData.map(item => ({
       ...item,
 
       image: item.image?.startsWith('data:')

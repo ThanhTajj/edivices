@@ -12,6 +12,8 @@ const CardComponent = (props) => {
     const handleDetailsProduct = (id) => {
         navigate(`/product-details/${id}`)
     }
+    const finalPrice =
+        discount > 0 ? price - (price * discount) / 100 : price;
     return (
         <WrapperCardStyle
             hoverable
@@ -35,16 +37,34 @@ const CardComponent = (props) => {
             <StyleNameProduct>{name}</StyleNameProduct>
             <WrapperReportText>
                 <span style={{ marginRight: '4px' }}>
-                    <span>{rating} </span> <StarFilled style={{ fontSize: '12px', color: 'rgb(253, 216, 54)' }} />
+                    <span>{rating.toFixed(1)} </span> <StarFilled style={{ fontSize: '12px', color: 'rgb(253, 216, 54)' }} />
                 </span>
                 <WrapperStyleTextSell> | Đã bán {selled || '0'}</WrapperStyleTextSell>
             </WrapperReportText>
             <WrapperPriceText>
-                <span style={{ marginRight: '8px' }}>{convertPrice(price)}</span>
-                {discount > 0 && (
-                    <WrapperDiscountText>
+                {discount > 0 ? (
+                    <>
+                    <div style={{ fontWeight: 700 }}>
+                        {convertPrice(finalPrice)}
+                    </div>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                        <span
+                            style={{
+                                textDecoration: 'line-through',
+                                color: '#999',
+                                fontSize: '13px'
+                            }}
+                        >
+                        {convertPrice(price)}
+                        </span>
+
+                        <WrapperDiscountText>
                         - {discount} %
-                    </WrapperDiscountText>
+                        </WrapperDiscountText>
+                    </div>
+                    </>
+                ) : (
+                    <span>{convertPrice(price)}</span>
                 )}
             </WrapperPriceText>
         </WrapperCardStyle>

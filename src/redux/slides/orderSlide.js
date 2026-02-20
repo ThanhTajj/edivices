@@ -54,6 +54,7 @@ export const orderSlide = createSlice({
       }
 
       saveOrderToLocalStorage(userId, state.orderItems)
+      state.isSucessOrder = true
     },
 
     increaseAmount: (state, action) => {
@@ -120,7 +121,25 @@ export const orderSlide = createSlice({
       )
     },
 
-    resetOrder: () => initialState,
+    resetOrder: (state) => {
+      state.orderItems = []
+      state.orderItemsSlected = []
+      state.shippingAddress = {}
+      state.paymentMethod = ''
+      state.itemsPrice = 0
+      state.shippingPrice = 0
+      state.taxPrice = 0
+      state.totalPrice = 0
+      state.isPaid = false
+      state.paidAt = ''
+      state.isDelivered = false
+      state.deliveredAt = ''
+      state.isSucessOrder = false
+    },
+
+    clearSuccess: (state) => {
+      state.isSucessOrder = false
+    },
   },
 })
 
@@ -133,6 +152,7 @@ export const {
   selectedOrder,
   resetOrder,
   loadCart,
+  clearSuccess,
 } = orderSlide.actions
 
 export default orderSlide.reducer

@@ -10,9 +10,10 @@ import { useMutationHooks } from '../../hooks/useMutationHook'
 import Loading from '../../components/LoadingComponent/Loading'
 import * as message from '../../components/Message/Message'
 import { updateUser } from '../../redux/slides/userSlide'
-import { Button, Upload } from 'antd'
+import { Breadcrumb, Button, Upload } from 'antd'
 import { UploadOutlined} from '@ant-design/icons'
 import { getBase64 } from '../../utils'
+import { Link } from 'react-router-dom'
 
 const ProfilePage = () => {
     const user = useSelector((state) => state.user)
@@ -80,7 +81,23 @@ const ProfilePage = () => {
     }
     return (
         <div style={{ width: '1310px', margin: '0 auto', height: '500px' }}>
-            <WrapperHeader>Thông tin người dùng</WrapperHeader>
+            <Breadcrumb
+                style={{ padding: '16px 0', fontSize: '16px', fontWeight: '500' }}
+                items={[
+                    {
+                    title: (
+                        <Link
+                        to="/"
+                        >
+                        Trang chủ
+                        </Link>
+                    ),
+                    },
+                    {
+                    title: 'Thông tin người dùng',
+                    },
+                ]}
+            />
             <Loading isLoading={isLoading}>
                 <WrapperContentProfile>
                     <WrapperInput>

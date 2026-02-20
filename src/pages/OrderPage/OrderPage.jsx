@@ -1,4 +1,4 @@
-import { Checkbox, Form } from 'antd'
+import { Breadcrumb, Checkbox, Form } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { CustomCheckbox, WrapperCountOrder, WrapperInfo, WrapperItemOrder, WrapperLeft, WrapperListOrder, WrapperRight, WrapperStyleHeader, WrapperStyleHeaderDilivery, WrapperTotal } from './style';
 import { DeleteOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons'
@@ -16,7 +16,7 @@ import * as  UserService from '../../services/UserService'
 import Loading from '../../components/LoadingComponent/Loading';
 import * as message from '../../components/Message/Message'
 import { updateUser } from '../../redux/slides/userSlide';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import StepComponent from '../../components/StepConponent/StepComponent';
 
 const OrderPage = () => {
@@ -210,7 +210,23 @@ const OrderPage = () => {
   return (
     <div style={{ background: '#f5f5fa', with: '100%', height: '100vh' }}>
       <div style={{ height: '100%', width: '1310px', margin: '0 auto' }}>
-        <h1 style={{ fontWeight: 'bold', fontSize: '18px' }}>Giỏ hàng</h1>
+        <Breadcrumb
+          style={{ padding: '16px 0', fontSize: '16px', fontWeight: '500' }}
+          items={[
+            {
+              title: (
+                <Link
+                  to="/"
+                >
+                  Trang chủ
+                </Link>
+              ),
+            },
+            {
+              title: 'Giỏ hàng',
+            },
+          ]}
+        />
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <WrapperLeft>
             <h2>Phí giao hàng</h2>

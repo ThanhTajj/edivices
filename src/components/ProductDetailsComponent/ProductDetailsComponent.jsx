@@ -1,6 +1,5 @@
-import { Col, Image, Rate, Row } from 'antd'
+import { Button, Col, Image, Rate, Row } from 'antd'
 import React from 'react'
-import imageProductSmall from '../../assets/images/imagesmall.webp'
 import { WrapperStyleImageSmall, WrapperStyleColImage, WrapperStyleNameProduct, WrapperStyleTextSell, WrapperPriceProduct, WrapperPriceTextProduct, WrapperAddressProduct, WrapperQualityProduct, WrapperInputNumber, WrapperBtnQualityProduct } from './style'
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons'
 import ButtonComponent from '../ButtonComponent/ButtonComponent'
@@ -10,16 +9,19 @@ import Loading from '../LoadingComponent/Loading'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { addOrderProduct, resetOrder } from '../../redux/slides/orderSlide'
+import { addOrderProduct, clearSuccess, resetOrder } from '../../redux/slides/orderSlide'
 import { convertPrice, initFacebookSDK } from '../../utils'
 import { useEffect } from 'react'
 import * as message from '../Message/Message'
 import LikeButtonComponent from '../LikeButtonComponent/LikeButtonComponent'
 import CommentComponent from '../CommentComponent/CommentComponent'
 import { useMutationHooks } from '../../hooks/useMutationHook'
-
+import { Input, Modal } from 'antd'
+const { TextArea } = Input
+import CardComponent from '../CardComponent/CardComponent'
 
 const ProductDetailsComponent = ({ idProduct }) => {
+    const [myComment, setMyComment] = useState("")
     const [numProduct, setNumProduct] = useState(1)
     const user = useSelector((state) => state.user)
     const order = useSelector((state) => state.order)
@@ -42,8 +44,6 @@ const ProductDetailsComponent = ({ idProduct }) => {
         setNumProduct(Number(value))
     }
 
-
-
     useEffect(() => {
         initFacebookSDK()
     }, [])
@@ -64,11 +64,9 @@ const ProductDetailsComponent = ({ idProduct }) => {
     }, [numProduct])
 
     useEffect(() => {
-        if (order.isSucessOrder) {
+        if(order.isSucessOrder){
             message.success('Đã thêm vào giỏ hàng')
-        }
-        return () => {
-            dispatch(resetOrder())
+            dispatch(clearSuccess())
         }
     }, [order.isSucessOrder])
 
@@ -84,8 +82,6 @@ const ProductDetailsComponent = ({ idProduct }) => {
         }
     }
 
-
-
     const mutationUpdate = useMutationHooks(
         (data) => {
             const { id, token, ...rests } = data
@@ -94,27 +90,68 @@ const ProductDetailsComponent = ({ idProduct }) => {
         },
     )
 
+    const mutationDelete = useMutationHooks(
+        (data)=>{
+            const {id, token} = data
+            return ProductService.deleteReview(id, token)
+        }
+    )
+    
+    useEffect(() => {
+        if(productDetails?.ratedUsers && user?.id){
+            const mine = productDetails.ratedUsers.find(
+                r => r.user?._id === user.id
+            )
+        }
+    }, [productDetails])
+
+    const handleDeleteReview = (reviewId)=>{
+        mutationDelete.mutate(
+        { id:idProduct, token:user.access_token },
+        {
+            onSuccess: ()=>{
+            message.success("Đã xoá đánh giá")
+            refetch()
+            }
+        }
+        )
+    }
+
     const handleRateChange = (value) => {
-        if (user?.access_token) {
-            setMyRating(value)
-            mutationUpdate.mutate({ id: idProduct, token: user?.access_token, rating: value }, {
-                onSuccess: (data) => {
-                    if (data?.status === 'OK') {
-                        message.success("Đánh giá thành công")
-                        refetch()
-                    } else {
-                        message.error(data?.message || "Đánh giá thất bại")
+        if (!user?.access_token) {
+            navigate('/sign-in', { state: location?.pathname })
+            return
+        }
+
+        Modal.confirm({
+            title: 'Xác nhận đánh giá',
+            content: `Bạn có chắc muốn đánh giá ${value} sao không?`,
+            okText: 'Đồng ý',
+            cancelText: 'Huỷ',
+            onOk: () => {
+                setMyRating(value)
+                mutationUpdate.mutate({
+                    id: idProduct,
+                    token: user.access_token,
+                    rating: value,
+                    comment: myComment
+                }, {
+                    onSuccess: (data) => {
+                        if (data?.status === 'OK') {
+                            message.success("Đánh giá thành công")
+                            refetch()
+                        } else {
+                            message.error(data?.message || "Đánh giá thất bại")
+                            setMyRating(productDetails?.rating)
+                        }
+                    },
+                    onError: () => {
+                        message.error("Đánh giá thất bại")
                         setMyRating(productDetails?.rating)
                     }
-                },
-                onError: () => {
-                    message.error("Đánh giá thất bại")
-                    setMyRating(productDetails?.rating)
-                }
-            })
-        } else {
-            navigate('/sign-in', { state: location?.pathname })
-        }
+                })
+            }
+        })
     }
 
     const handleChangeAddress = () => {
@@ -129,17 +166,6 @@ const ProductDetailsComponent = ({ idProduct }) => {
         if (!user?.id) {
             navigate('/sign-in', { state: location?.pathname })
         } else {
-            // {
-            //     name: { type: String, required: true },
-            //     amount: { type: Number, required: true },
-            //     image: { type: String, required: true },
-            //     price: { type: Number, required: true },
-            //     product: {
-            //         type: mongoose.Schema.Types.ObjectId,
-            //         ref: 'Product',
-            //         required: true,
-            //     },
-            // },
             const orderRedux = order?.orderItems?.find((item) => item.product === productDetails?._id)
             if ((orderRedux?.amount + numProduct) <= orderRedux?.countInstock || (!orderRedux && productDetails?.countInStock > 0)) {
                 dispatch(addOrderProduct({
@@ -158,6 +184,73 @@ const ProductDetailsComponent = ({ idProduct }) => {
             }
         }
     }
+    
+    const finalPrice =
+        productDetails?.discount > 0
+            ? Math.round(
+                productDetails.price * (1 - productDetails.discount / 100)
+            )
+            : productDetails?.price
+    const sortedReviews = React.useMemo(() => {
+        if (!productDetails?.ratedUsers) return []
+        const mine = []
+        const others = []
+        productDetails.ratedUsers.forEach(r => {
+            if (r.user?._id === user.id) {
+                mine.push(r)
+            } else {
+                others.push(r)
+            }
+        })
+        return [...mine, ...others]
+    }, [productDetails, user.id])
+
+    const fetchRelatedProducts = async () => {
+        const res = await ProductService.getProductType(productDetails?.type)
+        return res.data
+    }
+
+    const fetchOtherProducts = async () => {
+        const res = await ProductService.getAllProduct()
+        return res.data
+    }
+
+    const { data: relatedProducts } = useQuery(
+        ['related-products', productDetails?.type],
+        fetchRelatedProducts,
+        { enabled: !!productDetails?.type }
+    )
+
+    const { data: otherProducts } = useQuery(
+        ['other-products'],
+        fetchOtherProducts
+    )
+
+    const filteredOtherProducts = React.useMemo(() => {
+        if (!otherProducts?.data || !productDetails?.type) return []
+
+        return otherProducts.data
+            .filter(p =>
+                p.type !== productDetails.type &&
+                p._id !== idProduct
+            )
+            .slice(0,6)
+    }, [otherProducts, productDetails])
+
+    const mergedProducts = React.useMemo(() => {
+        if (!relatedProducts || !otherProducts) return []
+
+        const related = relatedProducts
+            .filter(p => p._id !== idProduct)
+
+        const others = otherProducts
+            .filter(p =>
+                p.type !== productDetails?.type &&
+                p._id !== idProduct
+            )
+
+        return [...related, ...others].slice(0, 8)
+    }, [relatedProducts, otherProducts, productDetails, idProduct])
 
     return (
         <Loading isLoading={isLoading}>
@@ -168,11 +261,47 @@ const ProductDetailsComponent = ({ idProduct }) => {
                 <Col span={14} style={{ paddingLeft: '10px' }}>
                     <WrapperStyleNameProduct>{productDetails?.name}</WrapperStyleNameProduct>
                     <div>
+                        <span style={{ fontWeight: 600, marginRight: 6, fontSize: '18px' }}>
+                            {productDetails?.rating?.toFixed(1)}
+                        </span>
                         <Rate allowHalf defaultValue={productDetails?.rating} value={myRating} onChange={handleRateChange} />
                         <WrapperStyleTextSell> | Đã bán {productDetails?.selled || '0'}</WrapperStyleTextSell>
+                        <WrapperStyleTextSell> | Tồn kho {productDetails?.countInStock}</WrapperStyleTextSell>
                     </div>
+                    <TextArea
+                        rows={3}
+                        placeholder="Viết nhận xét của bạn..."
+                        value={myComment}
+                        onChange={(e) => setMyComment(e.target.value)}
+                        style={{ marginTop: 10 }}
+                    />
                     <WrapperPriceProduct>
-                        <WrapperPriceTextProduct>{convertPrice(productDetails?.price)}</WrapperPriceTextProduct>
+                        {productDetails?.discount > 0 ? (
+                            <WrapperPriceTextProduct>
+                                {convertPrice(finalPrice)}
+                                <span
+                                    style={{
+                                        textDecoration: 'line-through',
+                                        color: '#999',
+                                        fontSize: '20px',
+                                    }}
+                                >
+                                {convertPrice(productDetails?.price)}
+                                </span>
+                                <span
+                                    style={{
+                                        color: '#ff3945',
+                                        fontSize: '20px',
+                                    }}
+                                    >
+                                    -{productDetails?.discount}%
+                                </span>
+                            </WrapperPriceTextProduct>
+                        ) : (
+                            <WrapperPriceTextProduct>
+                            {convertPrice(productDetails?.price)}
+                            </WrapperPriceTextProduct>
+                        )}
                     </WrapperPriceProduct>
                     <WrapperAddressProduct>
                         <span>Giao đến </span>
@@ -212,10 +341,77 @@ const ProductDetailsComponent = ({ idProduct }) => {
                                 textButton={'Thêm vào giỏ hàng'}
                                 styleTextButton={{ color: '#fff', fontSize: '15px', fontWeight: '700' }}
                             ></ButtonComponent>
-                            {errorLimitOrder && <div style={{ color: 'red' }}>San pham het hang</div>}
+                            {errorLimitOrder && <div style={{ color: 'red', textAlign: 'center' }}>Sản phẩm đã hết hàng!</div>}
                         </div>
                     </div>
                 </Col>
+                <Row gutter={16} style={{ marginTop: 20 }}>
+                    <Col span={16}>
+                        <div style={{ fontWeight: 700, marginBottom: 12 }}>
+                            Danh sách đánh giá ({productDetails?.ratedUsers?.length})
+                        </div>
+                        {sortedReviews.map(r => {
+                            const isMine = r.user?._id === user.id
+                            return (
+                                <div
+                                    key={r._id}
+                                    style={{
+                                        padding:12,
+                                        borderBottom:'1px solid #eee',
+                                        background: isMine ? '#eaf5ff' : 'transparent',
+                                        marginTop: 10,
+                                        display:'flex',
+                                        justifyContent:'space-between',
+                                        alignItems:'center'
+                                    }}
+                                >
+                                <div style={{display: 'flex', flexDirection:'column', gap: '5px'}}>
+                                    <div style={{display:'flex',alignItems:'center',gap:10}}>
+                                        <img
+                                            src={r.user?.avatar}
+                                            style={{width:32,height:32,borderRadius:'50%'}}
+                                        />
+                                        <b>{r.user?.name}</b>
+                                    </div>
+                                    <Rate disabled allowHalf value={r.rating} />
+                                    <div>{r.comment}</div>
+                                </div>
+                                {isMine && (
+                                    <Button
+                                        danger
+                                        size="small"
+                                        onClick={()=>handleDeleteReview(r._id)}
+                                    >
+                                        Xoá đánh giá
+                                    </Button>
+                                )}
+                            </div>
+                            )
+                        })}
+                    </Col>
+                    <Col span={8}>
+                        <div style={{ fontWeight: 700, marginBottom: 12 }}>
+                            Sản phẩm khác
+                        </div>
+                        <Row gutter={[12,12]}>
+                            {mergedProducts.map(product => (
+                                <Col span={12} key={product._id}>
+                                    <CardComponent
+                                        id={product._id}
+                                        name={product.name}
+                                        image={product.image}
+                                        price={product.price}
+                                        rating={product.rating}
+                                        discount={product.discount}
+                                        selled={product.selled}
+                                        countInStock={product.countInStock}
+                                    />
+                                </Col>
+                            ))}
+                        </Row>
+
+                    </Col>
+                </Row>
                 <CommentComponent
                     dataHref={process.env.REACT_APP_IS_LOCAL
                         ? "https://developers.facebook.com/docs/plugins/comments#configurator"
@@ -224,7 +420,6 @@ const ProductDetailsComponent = ({ idProduct }) => {
                     width="1310"
                 />
             </Row >
-
         </Loading>
     )
 }

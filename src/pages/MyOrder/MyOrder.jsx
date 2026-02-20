@@ -6,9 +6,10 @@ import { useSelector } from 'react-redux';
 import { convertPrice } from '../../utils';
 import { WrapperItemOrder, WrapperListOrder, WrapperHeaderItem, WrapperFooterItem, WrapperContainer, WrapperStatus } from './style';
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useMutationHooks } from '../../hooks/useMutationHook';
 import * as message from '../../components/Message/Message'
+import { Breadcrumb } from 'antd';
 
 const MyOrderPage = () => {
   const location = useLocation()
@@ -16,8 +17,11 @@ const MyOrderPage = () => {
   const navigate = useNavigate()
   const fetchMyOrder = async () => {
     const res = await OrderService.getOrderByUserId(state?.id, state?.token)
-    console.log(res)
-    return res?.data || []
+    return Array.isArray(res?.data?.data)
+      ? res.data.data
+      : Array.isArray(res?.data)
+      ? res.data
+      : []
   }
   const user = useSelector((state) => state.user)
 
@@ -91,14 +95,30 @@ const MyOrderPage = () => {
     <Loading isLoading={isLoading || isLoadingCancel}>
       <WrapperContainer>
         <div style={{ height: '100%', width: '1310px', margin: '0 auto' }}>
-          <h4>Đơn hàng của tôi</h4>
+          <Breadcrumb
+            style={{ padding: '16px 0', fontSize: '16px', fontWeight: '500' }}
+            items={[
+              {
+                title: (
+                  <Link
+                    to="/"
+                  >
+                    Trang chủ
+                  </Link>
+                ),
+              },
+              {
+                title: 'Đơn hàng của tôi',
+              },
+            ]}
+          />
           <WrapperListOrder>
             {data?.length === 0 && (
               <h2 style={{ textAlign: 'center', padding: '40px' }}>
                 Bạn chưa có đơn hàng nào
               </h2>
             )}
-            {(data || []).map((order) => {
+            {Array.isArray(data) && data.map((order) => {
               return (
                 <WrapperItemOrder key={order?._id}>
                   <WrapperStatus>

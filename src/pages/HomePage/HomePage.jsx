@@ -17,7 +17,7 @@ import ProductSection from '../../components/ProductSection/ProductSection'
 
 const HomePage = () => {
   const [loading, setLoading] = useState(false)
-  const [limit, setLimit] = useState(20)
+  const [limit, setLimit] = useState(200)
   const [typeProducts, setTypeProducts] = useState([])
 
   const fetchProductAll = async (context) => {

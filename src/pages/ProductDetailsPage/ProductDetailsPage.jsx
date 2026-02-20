@@ -38,7 +38,7 @@ const ProductDetailsPage = () => {
       </div>
       <div style={{ width: '1310px', height: '100%', margin: '0 auto' }} >
         <Breadcrumb
-          style={{ padding: '16px 0', fontSize: '16px' }}
+          style={{ padding: '16px 0', fontSize: '16px', fontWeight: '500' }}
           items={[
             {
               title: (

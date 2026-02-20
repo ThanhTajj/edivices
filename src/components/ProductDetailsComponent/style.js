@@ -37,6 +37,9 @@ export const WrapperPriceTextProduct = styled.h1`
     font-weight: 500;
     padding: 10px;
     margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 `
 
 export const WrapperAddressProduct = styled.div`

@@ -46,12 +46,16 @@ export const updateProduct = async (id, access_token, data) => {
 }
 
 export const rateProduct = async (id, access_token, data) => {
-    const res = await axiosJWT.post(`${process.env.REACT_APP_API_URL}/product/rate/${id}`, data, {
-        headers: {
-            token: `Bearer ${access_token}`,
-        }
-    })
-    return res.data
+  const res = await axios.post(
+    `${process.env.REACT_APP_API_URL}/product/rate/${id}`,
+    data,
+    {
+      headers:{
+        token:`Bearer ${access_token}`
+      }
+    }
+  )
+  return res.data
 }
 
 export const deleteProduct = async (id, access_token) => {
@@ -85,6 +89,18 @@ export const searchProduct = async (keyword) => {
         filter: keyword,
         limit: 8,
         page: 0
+      }
+    }
+  )
+  return res.data
+}
+
+export const deleteReview = async (id, token) => {
+  const res = await axios.delete(
+    `${process.env.REACT_APP_API_URL}/product/review/${id}`,
+    {
+      headers:{
+        token:`Bearer ${token}`
       }
     }
   )
