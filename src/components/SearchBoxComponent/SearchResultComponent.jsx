@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import * as ProductService from '../../services/ProductService'
@@ -6,6 +6,24 @@ import { SearchBoxWrapper, SearchItem } from './style'
 
 const SearchResultComponent = ({ keyword, onClose }) => {
   const navigate = useNavigate()
+  const wrapperRef = useRef(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(event.target)
+      ) {
+        onClose()
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [onClose])
 
   const { data, isLoading } = useQuery(
     ['search-product', keyword],
@@ -17,14 +35,14 @@ const SearchResultComponent = ({ keyword, onClose }) => {
 
   if (isLoading) {
     return (
-      <SearchBoxWrapper>
+      <SearchBoxWrapper ref={wrapperRef}>
         <div style={{ padding: 8 }}>Loading...</div>
       </SearchBoxWrapper>
     )
   }
 
   return (
-    <SearchBoxWrapper>
+    <SearchBoxWrapper ref={wrapperRef}>
       {data?.data?.length === 0 && (
         <div style={{ padding: 8 }}>Không tìm thấy sản phẩm</div>
       )}

@@ -5,7 +5,7 @@ import { useLocation, useParams, useSearchParams } from 'react-router-dom'
 import NavBarComponent from '../../components/NavBarComponent/NavBarComponent'
 import CardComponent from '../../components/CardComponent/CardComponent'
 import Loading from '../../components/LoadingComponent/Loading'
-import { WrapperNavbar, WrapperProducts, WrapperTypeProduct } from './style'
+import { WrapperButtonMore, WrapperNavbar, WrapperProducts, WrapperTypeProduct } from './style'
 import * as ProductService from '../../services/ProductService'
 import TypeProduct from '../../components/TypeProduct/TypeProduct'
 
@@ -20,7 +20,6 @@ const TypeProductPage = () => {
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState(false)
     const [panigate, setPanigate] = useState({
-        page: 0,
         limit: 10,
         total: 0,
     })
@@ -40,7 +39,7 @@ const TypeProductPage = () => {
     }
 
     useEffect(() => {
-    fetchAllTypeProduct()
+        fetchAllTypeProduct()
     }, [])
 
     const fetchProducts = async () => {
@@ -51,13 +50,13 @@ const TypeProductPage = () => {
             if (isSearchPage && keyword) {
                 res = await ProductService.searchProduct(
                     keyword,
-                    panigate.page,
+                    0,
                     panigate.limit
                 )
             } else if (type) {
                 res = await ProductService.getProductType(
                     type,
-                    panigate.page,
+                    0,
                     panigate.limit
                 )
             }
@@ -75,12 +74,8 @@ const TypeProductPage = () => {
     }
 
     useEffect(() => {
-        setPanigate(prev => ({ ...prev, page: 0 }))
-    }, [keyword, type])
-
-    useEffect(() => {
         fetchProducts()
-    }, [keyword, type, panigate.page, panigate.limit])
+    }, [keyword, type, panigate.limit])
 
     const onChange = (current, pageSize) => {
         setPanigate(prev => ({
@@ -100,6 +95,22 @@ const TypeProductPage = () => {
     const distinctBrands = [
         ...new Set(products.map(p => p.brand).filter(Boolean))
     ]
+
+    useEffect(() => {
+        setPanigate({
+            limit: 10,
+            total: 0
+        })
+    }, [keyword, type])
+
+    useEffect(() => {
+        if (location.state?.priceRange) {
+            setFilters(prev => ({
+                ...prev,
+                price: location.state.priceRange
+            }))
+        }
+    }, [location.state])
 
     return (
         <Loading isLoading={loading}>
@@ -154,14 +165,27 @@ const TypeProductPage = () => {
                                         />
                                     ))}
                             </WrapperProducts>
-
-                            <Pagination
-                                current={panigate.page + 1}
-                                pageSize={panigate.limit}
-                                total={panigate.total}
-                                onChange={onChange}
-                                style={{ textAlign: 'center', marginTop: 10, display: 'flex', justifyContent: 'center' }}
-                            />
+                            {panigate.limit < panigate.total && (
+                                <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
+                                    <WrapperButtonMore
+                                        textButton="Xem thêm"
+                                        type="outline"
+                                        styleButton={{
+                                            border: '1px solid #0057D9',
+                                            color: '#0057D9',
+                                            width: '240px',
+                                            height: '38px',
+                                            borderRadius: '4px'
+                                        }}
+                                        onClick={() =>
+                                            setPanigate(prev => ({
+                                                ...prev,
+                                                limit: prev.limit + 10
+                                            }))
+                                        }
+                                    />
+                                </div>
+                            )}
                         </Col>
                     </Row>
                 </div>

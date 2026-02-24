@@ -1,5 +1,6 @@
 import { Col } from "antd"
 import styled from "styled-components"
+import ButtonComponent from "../../components/ButtonComponent/ButtonComponent"
 
 export const WrapperProducts = styled.div`
     display: flex;
@@ -27,4 +28,17 @@ export const WrapperTypeProduct = styled.div`
     border-bottom: 1px solid #e5e5e5;
     padding-bottom: 10px;
     margin-bottom: 10px;
+`
+export const WrapperButtonMore = styled(ButtonComponent)`
+    &:hover {
+        color: #fff;
+        background: #0057D9;
+        span {
+            color: #fff;
+        }
+    }
+    width: 100%;
+    color: #0057D9;
+    text-align: center;
+    cursor: ${(props) => props.disabled ? 'not-allowed' : 'pointers'}
 `

@@ -1,6 +1,6 @@
 import { Button, Col, Image, Rate, Row } from 'antd'
 import React from 'react'
-import { WrapperStyleImageSmall, WrapperStyleColImage, WrapperStyleNameProduct, WrapperStyleTextSell, WrapperPriceProduct, WrapperPriceTextProduct, WrapperAddressProduct, WrapperQualityProduct, WrapperInputNumber, WrapperBtnQualityProduct } from './style'
+import { WrapperStyleNameProduct, WrapperStyleTextSell, WrapperPriceProduct, WrapperPriceTextProduct, WrapperAddressProduct, WrapperQualityProduct, WrapperInputNumber, WrapperBtnQualityProduct } from './style'
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons'
 import ButtonComponent from '../ButtonComponent/ButtonComponent'
 import * as ProductService from '../../services/ProductService'
@@ -13,12 +13,11 @@ import { addOrderProduct, clearSuccess, resetOrder } from '../../redux/slides/or
 import { convertPrice, initFacebookSDK } from '../../utils'
 import { useEffect } from 'react'
 import * as message from '../Message/Message'
-import LikeButtonComponent from '../LikeButtonComponent/LikeButtonComponent'
-import CommentComponent from '../CommentComponent/CommentComponent'
 import { useMutationHooks } from '../../hooks/useMutationHook'
 import { Input, Modal } from 'antd'
 const { TextArea } = Input
 import CardComponent from '../CardComponent/CardComponent'
+import defaultAvatar from '../../assets/images/default-avatar.jfif'
 
 const ProductDetailsComponent = ({ idProduct }) => {
     const [myComment, setMyComment] = useState("")
@@ -43,10 +42,6 @@ const ProductDetailsComponent = ({ idProduct }) => {
     const onChange = (value) => {
         setNumProduct(Number(value))
     }
-
-    useEffect(() => {
-        initFacebookSDK()
-    }, [])
 
     useEffect(() => {
         if (productDetails?.rating) {
@@ -226,17 +221,6 @@ const ProductDetailsComponent = ({ idProduct }) => {
         fetchOtherProducts
     )
 
-    const filteredOtherProducts = React.useMemo(() => {
-        if (!otherProducts?.data || !productDetails?.type) return []
-
-        return otherProducts.data
-            .filter(p =>
-                p.type !== productDetails.type &&
-                p._id !== idProduct
-            )
-            .slice(0,6)
-    }, [otherProducts, productDetails])
-
     const mergedProducts = React.useMemo(() => {
         if (!relatedProducts || !otherProducts) return []
 
@@ -308,12 +292,6 @@ const ProductDetailsComponent = ({ idProduct }) => {
                         <span className='address'>{user?.address}</span> -
                         <span className='change-address' style={{ color: 'rgb(11, 116, 229)', cursor: 'pointer' }} onClick={handleChangeAddress}>Đổi địa chỉ</span>
                     </WrapperAddressProduct>
-                    <LikeButtonComponent
-                        dataHref={process.env.REACT_APP_IS_LOCAL
-                            ? "https://developers.facebook.com/docs/plugins/"
-                            : window.location.href
-                        }
-                    />
                     <div style={{ margin: '10px 0 20px', padding: '10px 0', borderTop: '1px solid #e5e5e5', borderBottom: '1px solid #e5e5e5' }}>
                         <div style={{ marginBottom: '10px' }}>Số lượng</div>
                         <WrapperQualityProduct>
@@ -368,9 +346,13 @@ const ProductDetailsComponent = ({ idProduct }) => {
                                 <div style={{display: 'flex', flexDirection:'column', gap: '5px'}}>
                                     <div style={{display:'flex',alignItems:'center',gap:10}}>
                                         <img
-                                            src={r.user?.avatar}
-                                            style={{width:32,height:32,borderRadius:'50%'}}
-                                        />
+                                            src={r.user?.avatar || defaultAvatar}
+                                            onError={(e) => {
+                                                e.target.src = defaultAvatar
+                                            }}
+                                            alt="avatar"
+                                            style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }}
+                                            />
                                         <b>{r.user?.name}</b>
                                     </div>
                                     <Rate disabled allowHalf value={r.rating} />
@@ -409,16 +391,8 @@ const ProductDetailsComponent = ({ idProduct }) => {
                                 </Col>
                             ))}
                         </Row>
-
                     </Col>
                 </Row>
-                <CommentComponent
-                    dataHref={process.env.REACT_APP_IS_LOCAL
-                        ? "https://developers.facebook.com/docs/plugins/comments#configurator"
-                        : window.location.href
-                    }
-                    width="1310"
-                />
             </Row >
         </Loading>
     )

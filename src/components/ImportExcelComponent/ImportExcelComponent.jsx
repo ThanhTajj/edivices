@@ -15,24 +15,30 @@ const ImportProductExcel = ({ token, onSuccess }) => {
   const validateProduct = (item, index) => {
     const row = index + 2
 
-    if (!item.name) return `Dòng ${row}: Thiếu name`
-    if (!item.image) return `Dòng ${row}: Thiếu image`
-    if (!item.type) return `Dòng ${row}: Thiếu type`
+    if (!item.name?.trim()) return `Dòng ${row}: Thiếu name`
+    if (!item.type?.trim()) return `Dòng ${row}: Thiếu type`
+    if (!item.image?.trim()) return `Dòng ${row}: Thiếu image`
 
-    if (isNaN(item.price) || Number(item.price) <= 0)
+    try {
+      new URL(item.image)
+    } catch {
+      return `Dòng ${row}: Image không phải URL`
+    }
+
+    if (item.price === '' || isNaN(item.price) || Number(item.price) <= 0)
       return `Dòng ${row}: price không hợp lệ`
 
-    if (isNaN(item.countInStock) || Number(item.countInStock) < 0)
+    if (item.countInStock === '' || isNaN(item.countInStock) || Number(item.countInStock) < 0)
       return `Dòng ${row}: countInStock không hợp lệ`
 
     if (
-      item.rating !== undefined &&
+      item.rating !== '' &&
       (isNaN(item.rating) || Number(item.rating) < 0 || Number(item.rating) > 5)
     )
       return `Dòng ${row}: rating phải từ 0–5`
 
     if (
-      item.discount !== undefined &&
+      item.discount !== '' &&
       (isNaN(item.discount) || Number(item.discount) < 0 || Number(item.discount) > 100)
     )
       return `Dòng ${row}: discount phải từ 0–100`
@@ -51,73 +57,96 @@ const ImportProductExcel = ({ token, onSuccess }) => {
       try {
         const workbook = XLSX.read(evt.target.result, { type: 'array' })
         const sheet = workbook.Sheets[workbook.SheetNames[0]]
-        const products = XLSX.utils.sheet_to_json(sheet, { defval: '' })
+
+        const rawProducts = XLSX.utils.sheet_to_json(sheet, { defval: '' })
+
+        const products = rawProducts.map(item => ({
+          name: item.Name,
+          price: item.Price,
+          rating: item.Rating,
+          countInStock: item['In Stock'],
+          type: item.Type,
+          brand: item.Brand,
+          discount: item['Discount (%)'],
+          image: item.Image,
+          description: item.Description
+        }))
 
         if (!products.length) {
           message.error('File Excel không có dữ liệu')
           return
         }
 
+        const validProducts = []
         const errors = []
+
         products.forEach((item, index) => {
           const err = validateProduct(item, index)
-          if (err) errors.push(err)
+          if (err) {
+            errors.push(err)
+          } else {
+            validProducts.push(item)
+          }
         })
-
-        if (errors.length) {
-          const errorText =
-            errors.slice(0, 3).join('\n') +
-            (errors.length > 3 ? '\n...' : '')
-
-          message.error(errorText)
-          return
-        }
 
         let successCount = 0
         const failed = []
 
-        for (const item of products) {
-        const res = await ProductService.createProduct(
+        for (const item of validProducts) {
+          const res = await ProductService.createProduct(
             {
-            name: item.name,
-            price: Number(item.price),
-            rating: item.rating !== '' ? Number(item.rating) : 5,
-            countInStock: Number(item.countInStock),
-            type: item.type,
-            brand: item.brand || '',
-            discount: item.discount !== '' ? Number(item.discount) : 0,
-            image: item.image,
-            description: item.description || '',
+              name: item.name,
+              price: Number(item.price),
+              rating: item.rating !== '' ? Number(item.rating) : 5,
+              countInStock: Number(item.countInStock),
+              type: item.type,
+              brand: item.brand || '',
+              discount: item.discount !== '' ? Number(item.discount) : 0,
+              image: item.image,
+              description: item.description || '',
             },
             token
-        )
+          )
 
-        if (res?.status === 'OK') {
+          if (res?.status === 'OK') {
             successCount++
-        } else {
-            failed.push({
-            name: item.name,
-            message: res?.message || 'Lỗi không xác định'
-            })
-        }
+          } else {
+            failed.push(`${item.name}: ${res?.message || 'Lỗi không xác định'}`)
+          }
         }
 
-        if (failed.length === 0) {
-            message.success(`Import thành công ${successCount} sản phẩm`)
+        const total = products.length
+
+        const summary =
+          `Import thành công ${successCount}/${total} sản phẩm.\n` +
+          (errors.length
+            ? '\nLỗi validate:\n' + errors.slice(0, 5).join('\n')
+            : '') +
+          (failed.length
+            ? '\n\nLỗi server:\n' + failed.slice(0, 5).join('\n')
+            : '')
+
+        if (successCount === total) {
+          message.success(summary)
         } else {
-            message.warning(
-                `Import thành công ${successCount}/${products.length} sản phẩm.\n` +
-                failed.slice(0, 3).map(f => `${f.name}: ${f.message}`).join('\n')
-            )
+          message.warning({
+            content: (
+              <div style={{ whiteSpace: 'pre-line' }}>
+                {summary}
+              </div>
+            ),
+            duration: 6
+          })
         }
+
         if (successCount > 0) {
-            onSuccess?.()
+          onSuccess?.()
         }
+
       } catch (err) {
         message.error(err?.response?.data?.message || 'Import thất bại')
       }
     }
-
     reader.readAsArrayBuffer(file)
   }
 

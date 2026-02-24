@@ -3,7 +3,7 @@ import styled from "styled-components"
 export const WrapperHeaderUser = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 20px;
 `
 
 export const WrapperInfoUser = styled.div`
@@ -13,15 +13,10 @@ export const WrapperInfoUser = styled.div`
     font-weight: bold;
     text-transform: uppercase;
   }
-  .address,.phone-info,.delivery-info,.delivery-fee,.payment-info {
+  .address,.phone-info,.payment-info {
     color: rgba(0, 0, 0, 0.65);
     font-size: 13px;
     margin-top: 8px;
-  }
-  .name-delivery {
-    color: rgb(234, 133, 0); 
-    font-weight: bold;
-    text-transform: uppercase;
   }
   .status-payment {
     margin-top: 8px;
@@ -33,7 +28,7 @@ export const WrapperLabel = styled.div`
   color: rgb(36, 36, 36);
   font-size: 13px;
   text-transform: uppercase;
-  margin-bottom: 15px;
+  margin-bottom: 5px;
 `
 export const WrapperContentInfo = styled.div`
   height: 118px;
@@ -79,5 +74,5 @@ export const WrapperItemLabel = styled.div`
 export const WrapperAllPrice = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: flex-end
+  margin-left: 1070px
 `

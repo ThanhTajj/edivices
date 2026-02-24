@@ -295,20 +295,19 @@ const PaymentPage = () => {
                   <span>Tổng tiền</span>
                   <span style={{ display: 'flex', flexDirection: 'column' }}>
                     <span style={{ color: 'rgb(254, 56, 52)', fontSize: '24px', fontWeight: 'bold' }}>{convertPrice(totalPriceMemo)}</span>
-                    <span style={{ color: '#000', fontSize: '11px' }}>(Đã bao gồm VAT nếu có)</span>
                   </span>
                 </WrapperTotal>
               </div>
               {payment === 'paypal' && sdkReady ? (
                 <div style={{ width: '320px' }}>
-                  {/* <PayPalButton
+                  <PayPalButton
                     amount={Math.round(totalPriceMemo / 30000)}
                     // shippingPreference="NO_SHIPPING" // default is "GET_FROM_FILE"
                     onSuccess={onSuccessPaypal}
                     onError={() => {
                       alert('Erroe')
                     }}
-                  /> */}
+                  />
                 </div>
               ) : (
                 <ButtonComponent

@@ -27,6 +27,9 @@ const SearchBoxComponent = () => {
           setValue(e.target.value)
           setOpen(true)
         }}
+        onFocus={() => {
+          if (searchDebounce) setOpen(true)
+        }}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
             handleSearch()

@@ -121,7 +121,6 @@ const OrderPage = () => {
     if (!order?.orderItemsSlected?.length) {
       return 0
     }
-
     if (priceMemo < 200000) {
       return 20000
     } else if (priceMemo <= 500000) {
@@ -185,6 +184,10 @@ const OrderPage = () => {
         }
       })
     }
+  }
+
+  const handleDetailsProduct = (id) => {
+    navigate(`/product-details/${id}`)
   }
 
   const handleOnchangeDetails = (e) => {
@@ -253,13 +256,14 @@ const OrderPage = () => {
                   <WrapperItemOrder key={order?.product}>
                     <div style={{ width: '390px', display: 'flex', alignItems: 'center', gap: 4 }}>
                       <CustomCheckbox onChange={onChange} value={order?.product} checked={listChecked.includes(order?.product)}></CustomCheckbox>
-                      <img src={order?.image} style={{ width: '77px', height: '79px', objectFit: 'cover' }} />
+                      <img src={order?.image} style={{ width: '77px', height: '79px', objectFit: 'cover', cursor: 'pointer' }} onClick={() =>  handleDetailsProduct(order?.product)}/>
                       <div style={{
                         width: 260,
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
-                      }}>{order?.name}</div>
+                        whiteSpace: 'nowrap',
+                        cursor: 'pointer'
+                      }} onClick={() =>  handleDetailsProduct(order?.product)}>{order?.name}</div>
                     </div>
                     <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <span>
@@ -309,7 +313,6 @@ const OrderPage = () => {
                 <span>Tổng tiền</span>
                 <span style={{ display: 'flex', flexDirection: 'column' }}>
                   <span style={{ color: 'rgb(254, 56, 52)', fontSize: '24px', fontWeight: 'bold' }}>{convertPrice(totalPriceMemo)}</span>
-                  <span style={{ color: '#000', fontSize: '11px' }}>(Đã bao gồm VAT nếu có)</span>
                 </span>
               </WrapperTotal>
             </div>

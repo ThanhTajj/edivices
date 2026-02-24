@@ -23,6 +23,8 @@ const AdminProduct = () => {
   const [isOpenDrawer, setIsOpenDrawer] = useState(false)
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false)
   const [isModalOpenDelete, setIsModalOpenDelete] = useState(false)
+  const [imageMode, setImageMode] = useState('upload')
+  const [imageModeDetails, setImageModeDetails] = useState('upload')
   const user = useSelector((state) => state?.user)
   const searchInput = useRef(null);
   const inittial = () => ({
@@ -110,12 +112,16 @@ const AdminProduct = () => {
   const fetchGetDetailsProduct = async (rowSelected) => {
     const res = await ProductService.getDetailsProduct(rowSelected)
     if (res?.data) {
+      const imageValue = res?.data?.image
+      setImageModeDetails(
+        imageValue?.startsWith('http') ? 'url' : 'upload'
+      )
       setStateProductDetails({
         name: res?.data?.name,
         price: res?.data?.price,
         description: res?.data?.description,
         rating: res?.data?.rating,
-        image: res?.data?.image,
+        image: imageValue,
         type: res?.data?.type,
         brand: res?.data?.brand,
         countInStock: res?.data?.countInStock,
@@ -240,22 +246,7 @@ const AdminProduct = () => {
         setTimeout(() => searchInput.current?.select(), 100);
       }
     },
-    // render: (text) =>
-    //   searchedColumn === dataIndex ? (
-    //     // <Highlighter
-    //     //   highlightStyle={{
-    //     //     backgroundColor: '#ffc069',
-    //     //     padding: 0,
-    //     //   }}
-    //     //   searchWords={[searchText]}
-    //     //   autoEscape
-    //     //   textToHighlight={text ? text.toString() : ''}
-    //     // />
-    //   ) : (
-    //     text
-    //   ),
   });
-
 
   const columns = [
     {
@@ -388,16 +379,8 @@ const AdminProduct = () => {
 
   const handleCloseDrawer = () => {
     setIsOpenDrawer(false);
-    setStateProductDetails({
-      name: '',
-      price: '',
-      description: '',
-      rating: '',
-      image: '',
-      type: '',
-      brand: '',
-      countInStock: ''
-    })
+    setImageModeDetails('upload')
+    setStateProductDetails(inittial())
     form.resetFields()
   };
 
@@ -481,6 +464,7 @@ const AdminProduct = () => {
       ...stateProduct,
       image: file.preview
     })
+    form.setFieldsValue({ image: file.preview })
   }
 
   const handleOnchangeAvatarDetails = async ({ fileList }) => {
@@ -616,24 +600,57 @@ const AdminProduct = () => {
             >
               <InputComponent value={stateProduct.discount} onChange={handleOnchange} name="discount" />
             </Form.Item>
+            <Form.Item label="Phương thức:">
+              <Select
+                value={imageMode}
+                onChange={(val) => {
+                  setImageMode(val)
+                  form.setFieldsValue({ image: '' })
+                  setStateProduct({ ...stateProduct, image: '' })
+                }}
+                options={[
+                  { value: 'upload', label: 'Upload file' },
+                  { value: 'url', label: 'Nhập link ảnh' }
+                ]}
+              />
+            </Form.Item>
             <Form.Item
               label="Image"
               name="image"
-              rules={[{ required: true, message: 'Please input your count image!' }]}
+              rules={[
+                {
+                  required: true,
+                  message: 'Vui lòng nhập file hoặc link ảnh!'
+                },
+              ]}
             >
-              <WrapperUploadFile onChange={handleOnchangeAvatar} maxCount={1}>
-                <Button >Select File</Button>
-                {stateProduct?.image && (
-                  <img src={stateProduct?.image} style={{
-                    height: '60px',
-                    width: '60px',
-                    borderRadius: '50%',
-                    objectFit: 'cover',
-                    marginLeft: '10px'
-                  }} alt="avatar" />
-                )}
-              </WrapperUploadFile>
+              {imageMode === 'upload' ? (
+                <WrapperUploadFile onChange={handleOnchangeAvatar} maxCount={1}>
+                  <Button>Select File</Button>
+                </WrapperUploadFile>
+              ) : (
+                <InputComponent
+                  name="image"
+                  value={stateProduct.image}
+                  onChange={handleOnchange}
+                  placeholder="https://example.com/image.jpg"
+                />
+              )}
             </Form.Item>
+            {stateProduct?.image && (
+              <img
+                src={stateProduct.image}
+                alt="preview"
+                style={{
+                  height: 60,
+                  width: 60,
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  marginTop: 10,
+                  marginLeft: 120
+                }}
+              />
+            )}
             <Form.Item wrapperCol={{ offset: 20, span: 16 }}>
               <Button type="primary" htmlType="submit">
                 Submit
@@ -724,24 +741,57 @@ const AdminProduct = () => {
             >
               <InputComponent value={stateProductDetails.discount} onChange={handleOnchangeDetails} name="discount" />
             </Form.Item>
+            <Form.Item label="Phương thức:">
+              <Select
+                value={imageModeDetails}
+                onChange={(val) => {
+                  setImageModeDetails(val)
+                  form.setFieldsValue({ image: '' })
+                  setStateProductDetails({ ...stateProductDetails, image: '' })
+                }}
+                options={[
+                  { value: 'upload', label: 'Upload file' },
+                  { value: 'url', label: 'Nhập link ảnh' }
+                ]}
+              />
+            </Form.Item>
             <Form.Item
               label="Image"
               name="image"
-              rules={[{ required: true, message: 'Please input your count image!' }]}
+              rules={[
+                {
+                  required: true,
+                  message: 'Vui lòng nhập file hoặc link ảnh!'
+                },
+              ]}
             >
-              <WrapperUploadFile onChange={handleOnchangeAvatarDetails} maxCount={1}>
-                <Button >Select File</Button>
-                {stateProductDetails?.image && (
-                  <img src={stateProductDetails?.image} style={{
-                    height: '60px',
-                    width: '60px',
-                    borderRadius: '50%',
-                    objectFit: 'cover',
-                    marginLeft: '10px'
-                  }} alt="avatar" />
-                )}
-              </WrapperUploadFile>
+              {imageModeDetails === 'upload' ? (
+                <WrapperUploadFile onChange={handleOnchangeAvatarDetails} maxCount={1}>
+                  <Button>Select File</Button>
+                </WrapperUploadFile>
+              ) : (
+                <InputComponent
+                  name="image"
+                  value={stateProductDetails.image}
+                  onChange={handleOnchangeDetails}
+                  placeholder="https://example.com/image.jpg"
+                />
+              )}
             </Form.Item>
+            {stateProductDetails?.image && (
+              <img
+                src={stateProductDetails.image}
+                alt="preview"
+                style={{
+                  height: 60,
+                  width: 60,
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  marginLeft: 120,
+                  marginTop: 10
+                }}
+              />
+            )}
             <Form.Item wrapperCol={{ offset: 20, span: 16 }}>
               <Button type="primary" htmlType="submit">
                 Apply

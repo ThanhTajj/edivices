@@ -1,16 +1,16 @@
 import React, { useState } from 'react'
-import { FilterItem, SectionBody, SectionFilters, SectionHeader, SectionTitle, WrapperSection } from './style'
+import { FilterItem, SectionBody, SectionFilters, SectionHeader, SectionTitle, WrapperButtonMore, WrapperSection } from './style'
 import CardComponent from '../CardComponent/CardComponent'
 import { useNavigate } from 'react-router-dom'
 
 const ProductSection = ({ title, products, filterOptions = [] }) => {
     const navigate = useNavigate()
-
+    const [visibleCount, setVisibleCount] = useState(6)
     const handleNavigate = (priceRange) => {
         const normalizedTitle = title.normalize("NFD").replace(/[\u0300-\u036f]/g, "")?.replace(/ /g, '_')
         navigate(`/product/${normalizedTitle}`, { state: { type: title, priceRange } })
     }
-
+    const visibleProducts = products?.slice(0, visibleCount)
     return (
         <WrapperSection>
             <SectionHeader>
@@ -31,7 +31,7 @@ const ProductSection = ({ title, products, filterOptions = [] }) => {
                 </SectionFilters>
             </SectionHeader>
             <SectionBody>
-                {products?.map((product) => {
+                {visibleProducts?.map((product) => {
                     return (
                         <CardComponent
                             key={product._id}
@@ -49,6 +49,22 @@ const ProductSection = ({ title, products, filterOptions = [] }) => {
                     )
                 })}
             </SectionBody>
+            {products?.length > visibleCount && (
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
+                <WrapperButtonMore
+                    textButton="Xem thêm"
+                    type="outline"
+                    styleButton={{
+                    border: '1px solid #0057D9',
+                    color: '#0057D9',
+                    width: '200px',
+                    height: '36px',
+                    borderRadius: '4px'
+                    }}
+                    onClick={() => setVisibleCount(prev => prev + 6)}
+                />
+                </div>
+            )}
         </WrapperSection>
     )
 }
