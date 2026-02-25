@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom'
 import * as UserService from '../../services/UserService'
 import { useMutationHooks } from '../../hooks/useMutationHook'
 import Loading from '../../components/LoadingComponent/Loading'
-import * as message from '../../components/Message/Message'
 import jwtDecode from 'jwt-decode'
 import { useDispatch } from 'react-redux'
 import { updateUser } from '../../redux/slides/userSlide'
@@ -29,7 +28,6 @@ const SignInPage = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      navigate('/')
       localStorage.setItem('access_token', JSON.stringify(data?.access_token))
       if(data?.access_token) {
         const decoded = jwtDecode(data?.access_token)
@@ -44,6 +42,7 @@ const SignInPage = () => {
     const res = await UserService.getDetailsUser(id, token)
     dispatch(updateUser({ ...res?.data, access_token: token }))
     dispatch(loadCart({ userId: id }))
+    navigate('/')
   }
 
   const handleNavigateSignUp = () => {
@@ -129,7 +128,10 @@ const SignInPage = () => {
             alt="logo"
             height="203px"
             width="203px"
+            style={{cursor: 'pointer'}}
+            onClick={() => navigate('/')}
           />
+          <div style={{fontSize:'20px', cursor:'pointer'}} onClick={() => navigate('/')}>Trang chủ</div>
         </WrapperContainerRight>
       </div>
     </div>

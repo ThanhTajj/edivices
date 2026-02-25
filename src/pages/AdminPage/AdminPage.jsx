@@ -15,9 +15,6 @@ import { Navigate } from 'react-router-dom';
 
 const AdminPage = () => {
   const user = useSelector((state) => state?.user)
-  if (!user?.isAdmin) {
-    return <Navigate to="/" replace />
-  }
 
   const items = [
     getItem('Người dùng', 'users', <UserOutlined />),
@@ -49,6 +46,10 @@ const AdminPage = () => {
     ]
   })
 
+  if (!user?.isAdmin) {
+    return <Navigate to="/" replace />
+  }
+  
   const renderPage = (key) => {
     switch (key) {
       case 'users':

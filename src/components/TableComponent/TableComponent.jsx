@@ -38,7 +38,7 @@ const TableComponent = (props) => {
   };
   
   const handleDeleteAll = () => {
-    handleDelteMany(rowSelectedKeys)
+    handleDelteMany?.(rowSelectedKeys)
   }
 
   const exportExcel = () => {
@@ -68,6 +68,7 @@ const TableComponent = (props) => {
         </div>
       )}
       <Table
+        {...props}
         rowSelection={{
           type: selectionType,
           ...rowSelection,
@@ -79,7 +80,6 @@ const TableComponent = (props) => {
           ...props.pagination,
           hideOnSinglePage: true
         }}
-        {...props}
       />
     </Loading>
   )

@@ -196,6 +196,7 @@ const OrderPage = () => {
       [e.target.name]: e.target.value
     })
   }
+  
   const itemsDelivery = [
     {
       title: '20.000 VND',
@@ -245,6 +246,7 @@ const OrderPage = () => {
               </span>
               <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span>Đơn giá</span>
+                <span>Giảm</span>
                 <span>Số lượng</span>
                 <span>Thành tiền</span>
                 <DeleteOutlined style={{ cursor: 'pointer' }} onClick={handleRemoveAllOrder} />
@@ -252,6 +254,12 @@ const OrderPage = () => {
             </WrapperStyleHeader>
             <WrapperListOrder>
               {order?.orderItems?.map((order) => {
+                const price = order?.price || 0
+                const amount = order?.amount || 0
+                const discountPercent = Number(order?.discount) || 0
+                const discountPrice = (price * discountPercent) / 100
+                const finalUnitPrice = price - discountPrice
+                const total = finalUnitPrice * amount
                 return (
                   <WrapperItemOrder key={order?.product}>
                     <div style={{ width: '390px', display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -268,6 +276,9 @@ const OrderPage = () => {
                     <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <span>
                         <span style={{ fontSize: '13px', color: '#242424' }}>{convertPrice(order?.price)}</span>
+                      </span>
+                      <span style={{ color: '#52c41a' }}>
+                        {`${convertPrice(discountPrice)} (${discountPercent}%)`}
                       </span>
                       <WrapperCountOrder>
                         <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('decrease', order?.product, order?.amount === 1)}>

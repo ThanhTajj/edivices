@@ -22,9 +22,6 @@ const OrderSucess = () => {
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <Card style={{ width: '100%', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
               <Descriptions title="Chi tiết đơn hàng" bordered column={1}>
-                {/* <Descriptions.Item label="Phương thức giao hàng">
-                  <span style={{ color: '#ea8500', fontWeight: 'bold' }}>{orderContant.delivery[state?.delivery]}</span> Giao hàng tiết kiệm
-                </Descriptions.Item> */}
                 <Descriptions.Item label="Phương thức thanh toán">
                   {orderContant.payment[state?.payment]}
                 </Descriptions.Item>
@@ -36,27 +33,81 @@ const OrderSucess = () => {
               <Divider orientation="left">Sản phẩm đã đặt</Divider>
 
               <WrapperItemOrderInfo>
-                {state.orders?.map((order) => {
+                {state?.orders?.map((order) => {
+                  const price = order?.price || 0
+                  const amount = order?.amount || 0
+                  const discountPercent = order?.discount || 0
+
+                  const discountPrice = (price * discountPercent) / 100
+                  const finalUnitPrice = price - discountPrice
+                  const total = finalUnitPrice * amount
+
                   return (
-                    <WrapperItemOrder key={order?.name} style={{ padding: '10px 0', borderBottom: '1px solid #f0f0f0' }}>
-                      <div style={{ width: '500px', display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <img src={order.image} style={{ width: '77px', height: '79px', objectFit: 'cover', borderRadius: '4px' }} />
-                        <div style={{
-                          flex: 1,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                          fontWeight: '500'
-                        }} title={order?.name}>{order?.name}</div>
+                    <WrapperItemOrder
+                      key={order?.product}
+                      style={{ padding: '10px 0', borderBottom: '1px solid #f0f0f0' }}
+                    >
+                      <div
+                        style={{
+                          width: '500px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 10
+                        }}
+                      >
+                        <img
+                          src={order.image}
+                          style={{
+                            width: '77px',
+                            height: '79px',
+                            objectFit: 'cover',
+                            borderRadius: '4px'
+                          }}
+                        />
+                        <div
+                          style={{
+                            flex: 1,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            fontWeight: '500'
+                          }}
+                          title={order?.name}
+                        >
+                          {order?.name}
+                        </div>
                       </div>
-                      <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '20px', justifyContent: 'flex-end' }}>
-                        <span>
-                          <span style={{ fontSize: '14px', color: '#555' }}>Đơn giá: {convertPrice(order?.price)}</span>
+
+                      <div
+                        style={{
+                          flex: 1,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '20px',
+                          justifyContent: 'flex-end'
+                        }}
+                      >
+                        <span style={{ fontSize: '14px', color: '#555' }}>
+                          Đơn giá: {convertPrice(price)}
                         </span>
-                        <span>
-                          <span style={{ fontSize: '14px', color: '#555' }}>SL: {order?.amount}</span>
+
+                        <span style={{ fontSize: '14px', color: '#52c41a' }}>
+                          Giảm: {convertPrice(discountPrice)} {`(${discountPercent}%)`}
                         </span>
-                        <span style={{ fontSize: '14px', color: '#ff4d4f', fontWeight: 'bold' }}>{convertPrice(order?.price * order?.amount)}</span>
+
+                        <span style={{ fontSize: '14px', color: '#555' }}>
+                          SL: {amount}
+                        </span>
+
+                        <span
+                          style={{
+                            fontSize: '14px',
+                            color: '#ff4d4f',
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          {convertPrice(total)}
+                        </span>
                       </div>
                     </WrapperItemOrder>
                   )

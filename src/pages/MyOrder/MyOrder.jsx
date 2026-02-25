@@ -9,26 +9,25 @@ import ButtonComponent from '../../components/ButtonComponent/ButtonComponent';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useMutationHooks } from '../../hooks/useMutationHook';
 import * as message from '../../components/Message/Message'
-import { Breadcrumb } from 'antd';
+import { Breadcrumb, Modal } from 'antd';
 
 const MyOrderPage = () => {
   const location = useLocation()
   const { state } = location
   const navigate = useNavigate()
   const fetchMyOrder = async () => {
-    const res = await OrderService.getOrderByUserId(state?.id, state?.token)
-    return Array.isArray(res?.data?.data)
-      ? res.data.data
-      : Array.isArray(res?.data)
-      ? res.data
-      : []
+    const res = await OrderService.getOrderByUserId(
+      user?.id,
+      user?.access_token
+    )
+    return res?.data || []
   }
   const user = useSelector((state) => state.user)
 
   const queryOrder = useQuery({
     queryKey: ['orders'],
     queryFn: fetchMyOrder,
-    enabled: !!state?.id && !!state?.token
+    enabled: !!user?.id && !!user?.access_token
   })
   const { isLoading, data } = queryOrder
 
@@ -49,10 +48,32 @@ const MyOrderPage = () => {
   )
 
   const handleCanceOrder = (order) => {
-    mutation.mutate({ id: order._id, token: state?.token, orderItems: order?.orderItems, userId: user.id }, {
-      onSuccess: () => {
-        queryOrder.refetch()
-      },
+    if (!user?.access_token) {
+      message.error('Vui lòng đăng nhập')
+      return
+    }
+
+    Modal.confirm({
+      title: 'Xác nhận hủy đơn',
+      content: 'Bạn có chắc muốn hủy đơn hàng này không?',
+      okText: 'Đồng ý',
+      cancelText: 'Huỷ',
+      okType: 'danger',
+      onOk: () => {
+        mutation.mutate(
+          {
+            id: order._id,
+            token: user?.access_token,
+            orderItems: order?.orderItems,
+            userId: user.id
+          },
+          {
+            onSuccess: () => {
+              queryOrder.refetch()
+            }
+          }
+        )
+      }
     })
   }
   const { isLoading: isLoadingCancel, isSuccess: isSuccessCancel, isError: isErrorCancle, data: dataCancel } = mutation
@@ -90,7 +111,13 @@ const MyOrderPage = () => {
       </WrapperHeaderItem>
     })
   }
-
+  const statusMap = {
+    PENDING: 'Chờ xác nhận',
+    CONFIRMED: 'Đã xác nhận',
+    SHIPPING: 'Đang giao',
+    DELIVERED: 'Đã giao',
+    CANCELLED: 'Đã hủy'
+  }
   return (
     <Loading isLoading={isLoading || isLoadingCancel}>
       <WrapperContainer>
@@ -122,14 +149,22 @@ const MyOrderPage = () => {
               return (
                 <WrapperItemOrder key={order?._id}>
                   <WrapperStatus>
-                    <span style={{ fontSize: '14px', fontWeight: 'bold' }}>Trạng thái</span>
+                    <span style={{ fontSize: '14px', fontWeight: 'bold' }}>Trạng thái đơn hàng</span>
                     <div>
-                      <span style={{ color: 'rgb(255, 66, 78)' }}>Giao hàng: </span>
-                      <span style={{ color: 'rgb(90, 32, 193)', fontWeight: 'bold' }}>{`${order.isDelivered ? 'Đã giao hàng' : 'Chưa giao hàng'}`}</span>
+                      <span style={{ color: 'rgb(255, 66, 78)' }}>Trạng thái: </span>
+                      <span style={{ color: 'rgb(90, 32, 193)', fontWeight: 'bold' }}>{statusMap[order.status] || 'Không xác định'}</span>
                     </div>
                     <div>
                       <span style={{ color: 'rgb(255, 66, 78)' }}>Thanh toán: </span>
-                      <span style={{ color: 'rgb(90, 32, 193)', fontWeight: 'bold' }}>{`${order.isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'}`}</span>
+                      <span style={{ color: 'rgb(90, 32, 193)', fontWeight: 'bold' }}>
+                        {order.status === 'CANCELLED' && order.isPaid && !order.refunded
+                          ? 'Đang chờ hoàn tiền'
+                          : order.refunded
+                          ? 'Đã hoàn tiền'
+                          : order.isPaid
+                          ? 'Đã thanh toán'
+                          : 'Chưa thanh toán'}
+                      </span>
                     </div>
                   </WrapperStatus>
                   {renderProduct(order?.orderItems)}
@@ -141,18 +176,20 @@ const MyOrderPage = () => {
                       >{convertPrice(order?.totalPrice)}</span>
                     </div>
                     <div style={{ display: 'flex', gap: '10px' }}>
-                      <ButtonComponent
-                        onClick={() => handleCanceOrder(order)}
-                        size={40}
-                        styleButton={{
-                          height: '36px',
-                          border: '1px solid #0057D9',
-                          borderRadius: '4px'
-                        }}
-                        textButton={'Hủy đơn hàng'}
-                        styleTextButton={{ color: '#0057D9', fontSize: '14px' }}
-                      >
-                      </ButtonComponent>
+                      {order.status !== 'DELIVERED' && order.status !== 'CANCELLED' && (
+                        <ButtonComponent
+                          onClick={() => handleCanceOrder(order)}
+                          size={40}
+                          styleButton={{
+                            height: '36px',
+                            border: '1px solid #0057D9',
+                            borderRadius: '4px'
+                          }}
+                          textButton={'Hủy đơn hàng'}
+                          styleTextButton={{ color: '#0057D9', fontSize: '14px' }}
+                        >
+                        </ButtonComponent>
+                      )}
                       <ButtonComponent
                         onClick={() => handleDetailsOrder(order?._id)}
                         size={40}

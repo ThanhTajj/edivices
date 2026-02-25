@@ -27,13 +27,19 @@ export const getDetailsOrder = async (id,access_token) => {
   return res.data
 }
 
-export const cancelOrder = async (id, access_token, orderItems, userId ) => {
-  const data = {orderItems, orderId: id}
-  const res = await axiosJWT.delete(`${process.env.REACT_APP_API_URL}/order/cancel-order/${userId}`, {data}, {
+export const cancelOrder = async (id, access_token, orderItems, userId) => {
+  const res = await axiosJWT.delete(
+    `${process.env.REACT_APP_API_URL}/order/cancel-order/${userId}`,
+    {
       headers: {
-          token: `Bearer ${access_token}`,
+        token: `Bearer ${access_token}`,
+      },
+      data: {
+        orderItems,
+        orderId: id
       }
-  })
+    }
+  )
   return res.data
 }
 
@@ -53,6 +59,32 @@ export const updateOrderStatus = async (id, access_token, data) => {
     {
       headers: {
         token: `Bearer ${access_token}`,
+      },
+    }
+  )
+  return res.data
+}
+
+export const refundOrder = async (id, token) => {
+  const res = await axiosJWT.put(
+    `${process.env.REACT_APP_API_URL}/order/refund/${id}`,
+    {},
+    {
+      headers: {
+        token: `Bearer ${token}`,
+      },
+    }
+  )
+  return res.data
+}
+
+export const deleteManyOrder = async (data, token) => {
+  const res = await axiosJWT.post(
+    `${process.env.REACT_APP_API_URL}/order/delete-many`,
+    data,
+    {
+      headers: {
+        token: `Bearer ${token}`,
       },
     }
   )

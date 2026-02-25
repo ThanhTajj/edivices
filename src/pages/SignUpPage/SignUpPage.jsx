@@ -9,6 +9,10 @@ import * as UserService from '../../services/UserService'
 import { useMutationHooks } from '../../hooks/useMutationHook'
 import Loading from '../../components/LoadingComponent/Loading'
 import * as message from '../../components/Message/Message'
+import { useDispatch } from 'react-redux'
+import jwtDecode from 'jwt-decode'
+import { loadCart } from '../../redux/slides/orderSlide'
+import { updateUser } from '../../redux/slides/userSlide'
 
 const SignUpPage = () => {
   const [email, setEmail] = useState('')
@@ -16,6 +20,7 @@ const SignUpPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('')
 
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const mutation = useMutationHooks(
     data => UserService.signupUser(data)
@@ -24,13 +29,27 @@ const SignUpPage = () => {
   const {data, isPending, isSuccess, isError} = mutation
 
   useEffect(() => {
-    if (isSuccess) {
-      message.success()
-      handleNavigateSignIn()
-    } else if (isError) {
-      message.error()
+    if (data?.access_token) {
+      message.success('Đăng ký thành công!')
+
+      localStorage.setItem('access_token', JSON.stringify(data.access_token))
+
+      const decoded = jwtDecode(data.access_token)
+
+      if (decoded?.id) {
+        handleGetDetailsUser(decoded.id, data.access_token)
+      }
+    } else if (data?.status === 'ERR') {
+      message.error(data?.message)
     }
-  }, [isSuccess, isError])
+  }, [data])
+
+  const handleGetDetailsUser = async (id, token) => {
+    const res = await UserService.getDetailsUser(id, token)
+    dispatch(updateUser({ ...res?.data, access_token: token }))
+    dispatch(loadCart({ userId: id }))
+    navigate('/')
+  }
 
   const handleNavigateSignIn = () => {
     navigate('/sign-in')
@@ -99,7 +118,10 @@ const SignUpPage = () => {
         </WrapperContainerLeft>
 
         <WrapperContainerRight>
-          <Image src={imageLogo} preview={false} alt="logo" height="203px" width="203px" />
+          <Image src={imageLogo} preview={false} alt="logo" height="203px" width="203px" 
+            onClick={() => navigate('/')}
+          />
+          <div style={{fontSize:'20px', cursor:'pointer'}} onClick={() => navigate('/')}>Trang chủ</div>
         </WrapperContainerRight>
       </div>
     </div>

@@ -16,17 +16,13 @@ import * as message from '../../components/Message/Message'
 import { updateUser } from '../../redux/slides/userSlide';
 import { useNavigate } from 'react-router-dom';
 import { removeAllOrderProduct } from '../../redux/slides/orderSlide';
-// import { PayPalButton } from "react-paypal-button-v2";
-import * as PaymentService from '../../services/PaymentService'
 
 const PaymentPage = () => {
   const order = useSelector((state) => state.order)
   const user = useSelector((state) => state.user)
 
-  // const [delivery, setDelivery] = useState('fast')
   const [payment, setPayment] = useState('later_money')
   const navigate = useNavigate()
-  const [sdkReady, setSdkReady] = useState(false)
 
   const [isOpenModalUpdateInfo, setIsOpenModalUpdateInfo] = useState(false)
   const [stateUserDetails, setStateUserDetails] = useState({
@@ -69,7 +65,7 @@ const PaymentPage = () => {
   const priceDiscountMemo = useMemo(() => {
     const result = order?.orderItemsSlected?.reduce((total, cur) => {
       const totalDiscount = cur.discount ? cur.discount : 0
-      return total + (priceMemo * (totalDiscount * cur.amount) / 100)
+      return total + ((cur.price * cur.amount) * totalDiscount / 100)
     }, 0)
     if (Number(result)) {
       return result
@@ -108,7 +104,10 @@ const PaymentPage = () => {
           shippingPrice: diliveryPriceMemo,
           totalPrice: totalPriceMemo,
           user: user?.id,
-          email: user?.email
+          email: user?.email,
+          isPaid: false,
+          paidAt: null,
+          status: payment === 'qr' ? 'PENDING_PAYMENT' : 'PENDING',
         }
       )
     }
@@ -146,11 +145,13 @@ const PaymentPage = () => {
       order?.orderItemsSlected?.forEach(element => {
         arrayOrdered.push(element.product)
       });
-      dispatch(removeAllOrderProduct({ listChecked: arrayOrdered }))
+      dispatch(removeAllOrderProduct({ 
+        listChecked: arrayOrdered,
+        userId: user?.id
+      }))
       message.success('Đặt hàng thành công')
       navigate('/orderSuccess', {
         state: {
-          // delivery,
           payment,
           orders: order?.orderItemsSlected,
           totalPriceMemo: totalPriceMemo
@@ -174,28 +175,6 @@ const PaymentPage = () => {
     setIsOpenModalUpdateInfo(false)
   }
 
-  const onSuccessPaypal = (details, data) => {
-    mutationAddOrder.mutate(
-      {
-        token: user?.access_token,
-        orderItems: order?.orderItemsSlected,
-        fullName: user?.name,
-        address: user?.address,
-        phone: user?.phone,
-        city: user?.city,
-        paymentMethod: payment,
-        itemsPrice: priceMemo,
-        shippingPrice: diliveryPriceMemo,
-        totalPrice: totalPriceMemo,
-        user: user?.id,
-        isPaid: true,
-        paidAt: details.update_time,
-        email: user?.email
-      }
-    )
-  }
-
-
   const handleUpdateInforUser = () => {
     const { name, address, city, phone } = stateUserDetails
     if (name && address && city && phone) {
@@ -214,56 +193,24 @@ const PaymentPage = () => {
       [e.target.name]: e.target.value
     })
   }
-  // const handleDilivery = (e) => {
-  //   setDelivery(e.target.value)
-  // }
 
   const handlePayment = (e) => {
     setPayment(e.target.value)
   }
 
-  const addPaypalScript = async () => {
-    const { data } = await PaymentService.getConfig()
-    const script = document.createElement('script')
-    script.type = 'text/javascript'
-    script.src = `https://www.paypal.com/sdk/js?client-id=${data}`
-    script.async = true;
-    script.onload = () => {
-      setSdkReady(true)
-    }
-    document.body.appendChild(script)
-  }
-
-  useEffect(() => {
-    if (!window.paypal) {
-      addPaypalScript()
-    } else {
-      setSdkReady(true)
-    }
-  }, [])
-
   return (
-    <div style={{ background: '#f5f5fa', with: '100%', height: '100vh' }}>
+    <div style={{ background: '#f5f5fa', width: '100%', height: '100vh' }}>
       <Loading isLoading={isLoadingAddOrder}>
         <div style={{ height: '100%', width: '1310px', margin: '0 auto' }}>
           <h3>Thanh toán</h3>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <WrapperLeft>
-              {/* <WrapperInfo>
-                <div>
-                  <Lable>Chọn phương thức giao hàng</Lable>
-                  <WrapperRadio onChange={handleDilivery} value={delivery}>
-                    <Radio value="fast"><span style={{ color: '#ea8500', fontWeight: 'bold' }}>FAST</span> Giao hàng tiết kiệm</Radio>
-                    <Radio value="gojek"><span style={{ color: '#ea8500', fontWeight: 'bold' }}>GO_JEK</span> Giao hàng tiết kiệm</Radio>
-                  </WrapperRadio>
-                </div>
-              </WrapperInfo> */}
               <WrapperInfo>
                 <div>
                   <Lable>Chọn phương thức thanh toán</Lable>
                   <WrapperRadio onChange={handlePayment} value={payment}>
                     <Radio value="later_money"> Thanh toán tiền mặt khi nhận hàng</Radio>
-                    <Radio value="paypal"> Thanh toán tiền bằng paypal</Radio>
+                    <Radio value="qr"> Thanh toán bằng mã QR</Radio>
                   </WrapperRadio>
                 </div>
               </WrapperInfo>
@@ -273,7 +220,7 @@ const PaymentPage = () => {
                 <WrapperInfo>
                   <div>
                     <span>Địa chỉ: </span>
-                    <span style={{ fontWeight: 'bold' }}>{`${user?.address} ${user?.city}`} </span>
+                    <span style={{ fontWeight: 'bold' }}>{`${user?.address} - ${user?.city}`} </span>
                     <span onClick={handleChangeAddress} style={{ color: '#0057D9', cursor: 'pointer' }}>Thay đổi</span>
                   </div>
                 </WrapperInfo>
@@ -298,15 +245,29 @@ const PaymentPage = () => {
                   </span>
                 </WrapperTotal>
               </div>
-              {payment === 'paypal' && sdkReady ? (
-                <div style={{ width: '320px' }}>
-                  <PayPalButton
-                    amount={Math.round(totalPriceMemo / 30000)}
-                    // shippingPreference="NO_SHIPPING" // default is "GET_FROM_FILE"
-                    onSuccess={onSuccessPaypal}
-                    onError={() => {
-                      alert('Erroe')
+              {payment === 'qr' ? (
+                <div style={{ width: '320px', textAlign: 'center' }}>
+                  <img
+                    src={`https://img.vietqr.io/image/MB-0384142502-compact2.png?amount=${totalPriceMemo}&addInfo=Thanh toan don hang`}
+                    alt="QR Code"
+                    style={{ width: '100%', marginBottom: '10px' }}
+                  />
+                  <p style={{ fontSize: '13px', color: '#666' }}>
+                    Sau khi chúng tôi xác nhận hóa đơn chuyển khoản, đơn hàng sẽ được xử lý.
+                  </p>
+                  <ButtonComponent
+                    onClick={() => handleAddOrder()}
+                    size={40}
+                    styleButton={{
+                      background: 'green',
+                      height: '48px',
+                      width: '320px',
+                      border: 'none',
+                      borderRadius: '4px',
+                      marginBottom: '20px'
                     }}
+                    textButton={'Tôi đã chuyển khoản'}
+                    styleTextButton={{ color: '#fff', fontSize: '15px', fontWeight: '700' }}
                   />
                 </div>
               ) : (
@@ -333,7 +294,6 @@ const PaymentPage = () => {
               name="basic"
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 20 }}
-              // onFinish={onUpdateUser}
               autoComplete="on"
               form={form}
             >

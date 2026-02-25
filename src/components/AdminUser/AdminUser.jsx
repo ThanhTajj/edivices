@@ -24,7 +24,6 @@ const AdminUser = () => {
   const [isModalOpenDelete, setIsModalOpenDelete] = useState(false)
   const user = useSelector((state) => state?.user)
   const searchInput = useRef(null);
-
   const [stateUserDetails, setStateUserDetails] = useState({
     name: '',
     email: '',
@@ -80,7 +79,7 @@ const AdminUser = () => {
   )
 
   const fetchGetDetailsUser = async (rowSelected) => {
-    const res = await UserService.getDetailsUser(rowSelected)
+    const res = await UserService.getDetailsUser(rowSelected, user?.access_token)
     if (res?.data) {
       setStateUserDetails({
         name: res?.data?.name,
@@ -192,20 +191,6 @@ const AdminUser = () => {
         setTimeout(() => searchInput.current?.select(), 100);
       }
     },
-    // render: (text) =>
-    //   searchedColumn === dataIndex ? (
-    //     // <Highlighter
-    //     //   highlightStyle={{
-    //     //     backgroundColor: '#ffc069',
-    //     //     padding: 0,
-    //     //   }}
-    //     //   searchWords={[searchText]}
-    //     //   autoEscape
-    //     //   textToHighlight={text ? text.toString() : ''}
-    //     // />
-    //   ) : (
-    //     text
-    //   ),
   });
 
   const columns = [

@@ -1,7 +1,7 @@
 import React from 'react'
 import { WrapperAllPrice, WrapperContentInfo, WrapperHeaderUser, WrapperInfoUser, WrapperItem, WrapperItemLabel, WrapperLabel, WrapperNameProduct, WrapperProduct, WrapperStyleContent } from './style'
 import logo from '../../assets/images/logo.png'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as OrderService from '../../services/OrderService'
 import { useQuery } from '@tanstack/react-query'
 import { orderContant } from '../../contant'
@@ -15,6 +15,7 @@ const DetailsOrderPage = () => {
   const location = useLocation()
   const { state } = location
   const { id } = params
+  const navigate = useNavigate()
 
   const fetchDetailsOrder = async () => {
     const res = await OrderService.getDetailsOrder(id, state?.token)
@@ -32,6 +33,10 @@ const DetailsOrderPage = () => {
     },0)
     return result
   },[data])
+
+  const handleDetailsProduct = (id) => {
+    navigate(`/product-details/${id}`)
+  }
 
   return (
    <Loading isLoading={isLoading}>
@@ -79,39 +84,76 @@ const DetailsOrderPage = () => {
               <div className='status-payment'>{data?.isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'}</div>
             </WrapperContentInfo>
           </WrapperInfoUser>
+          <WrapperInfoUser>
+            <WrapperLabel>Trang thái đơn hàng</WrapperLabel>
+            <WrapperContentInfo>
+              <div className='payment-info'>{orderContant?.status?.[data?.status] || 'Không xác định'}</div>
+            </WrapperContentInfo>
+          </WrapperInfoUser>
+          <WrapperInfoUser>
+            <WrapperLabel>Thời gian đặt hàng</WrapperLabel>
+            <WrapperContentInfo>
+              <div className='payment-info'>{data?.createdAt && new Date(data.createdAt).toLocaleString('vi-VN')}</div>
+            </WrapperContentInfo>
+          </WrapperInfoUser>
         </WrapperHeaderUser>
         <WrapperStyleContent>
           <div style={{flex:1, display: 'flex', alignItems: 'center'}}>
-            <div style={{width: '670px'}}>Sản phẩm</div>
+            <div style={{width: '670px', fontSize: '16px'}}>Sản phẩm</div>
             <WrapperItemLabel>Giá</WrapperItemLabel>
             <WrapperItemLabel>Số lượng</WrapperItemLabel>
             <WrapperItemLabel>Giảm giá</WrapperItemLabel>
+            <WrapperItemLabel>Thành tiền</WrapperItemLabel>
           </div>
           {data?.orderItems?.map((order) => {
+            const price = order?.price || 0
+            const amount = order?.amount || 0
+            const discountPercent = Number(order?.discount) || 0
+            const discountPrice = (price * discountPercent) / 100
+            const finalUnitPrice = price - discountPrice
+            const total = finalUnitPrice * amount
             return (
-              <WrapperProduct>
+              <WrapperProduct key={order?._id}>
                 <WrapperNameProduct>
-                  <img src={order?.image} 
+                  <img
+                    src={order?.image}
                     style={{
-                      width: '70px', 
-                      height: '70px', 
+                      width: '70px',
+                      height: '70px',
                       objectFit: 'cover',
                       border: '1px solid rgb(238, 238, 238)',
-                      padding: '2px'
+                      padding: '2px',
+                      cursor: 'pointer'
                     }}
+                    onClick={() =>  handleDetailsProduct(order?.product)}
                   />
-                  <div style={{
-                    width: 260,
-                    overflow: 'hidden',
-                    textOverflow:'ellipsis',
-                    whiteSpace:'nowrap',
-                    marginLeft: '10px',
-                    height: '70px',
-                  }}>{order?.name}</div>
+                  <div
+                    style={{
+                      width: 260,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      marginLeft: '10px',
+                      height: '70px',
+                      cursor: 'pointer'
+                    }}
+                    onClick={() =>  handleDetailsProduct(order?.product)}
+                  >
+                    {order?.name}
+                  </div>
                 </WrapperNameProduct>
-                <WrapperItem>{convertPrice(order?.price)}</WrapperItem>
-                <WrapperItem>{order?.amount}</WrapperItem>
-                <WrapperItem>{order?.discount ? convertPrice(priceMemo * order?.discount / 100) : '0 VND'}</WrapperItem>                
+
+                <WrapperItem>{convertPrice(price)}</WrapperItem>
+
+                <WrapperItem>{amount}</WrapperItem>
+
+                <WrapperItem style={{ color: '#52c41a' }}>
+                  {`${convertPrice(discountPrice)} (${discountPercent}%)`}
+                </WrapperItem>
+
+                <WrapperItem style={{ color: '#ff4d4f', fontWeight: '600' }}>
+                  {convertPrice(total)}
+                </WrapperItem>
               </WrapperProduct>
             )
           })}

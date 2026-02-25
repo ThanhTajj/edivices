@@ -5,7 +5,6 @@ import { WrapperButtonMore, WrapperProducts, WrapperTypeProduct } from './style'
 import slider1 from '../../assets/images/slider1.webp'
 import slider2 from '../../assets/images/slider2.webp'
 import slider3 from '../../assets/images/slider3.webp'
-import CardComponent from '../../components/CardComponent/CardComponent'
 import { useQuery } from '@tanstack/react-query'
 import * as ProductService from '../../services/ProductService'
 import { useSelector } from 'react-redux'
@@ -24,9 +23,7 @@ const HomePage = () => {
     const limit = context?.queryKey && context?.queryKey[1]
     const search = context?.queryKey && context?.queryKey[2]
     const res = await ProductService.getAllProduct(search, limit)
-
     return res
-
   }
 
   const fetchAllTypeProduct = async () => {
@@ -65,17 +62,6 @@ const HomePage = () => {
               />
             )
           })}
-          {/* <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-            <WrapperButtonMore
-              textButton={isPreviousData ? 'Load more' : "Xem thêm"} type="outline" styleButton={{
-                border: `1px solid ${products?.total === products?.data?.length ? '#f5f5f5' : '#0057D9'}`, color: `${products?.total === products?.data?.length ? '#f5f5f5' : '#0057D9'}`,
-                width: '240px', height: '38px', borderRadius: '4px'
-              }}
-              disabled={products?.total === products?.data?.length || products?.totalPage === 1}
-              styleTextButton={{ fontWeight: 500, color: products?.total === products?.data?.length && '#fff' }}
-              onClick={() => setLimit((prev) => prev + 6)}
-            />
-          </div> */}
         </div>
       </div>
     </Loading>

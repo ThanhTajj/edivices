@@ -1,4 +1,4 @@
-import { Button, Form, Space } from 'antd'
+import { Button, Form, Select, Space } from 'antd'
 import React from 'react'
 import { WrapperHeader, WrapperUploadFile } from './style'
 import TableComponent from '../TableComponent/TableComponent'
@@ -19,17 +19,12 @@ import PieChartComponent from './PieChart'
 
 const OrderAdmin = () => {
   const user = useSelector((state) => state?.user)
-
-
   const getAllOrder = async () => {
     const res = await OrderService.getAllOrder(user?.access_token)
     return res
   }
-
-
   const queryOrder = useQuery({ queryKey: ['orders'], queryFn: getAllOrder })
   const { isLoading: isLoadingOrders, data: orders } = queryOrder
-
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
       <div
@@ -87,22 +82,43 @@ const OrderAdmin = () => {
         // setTimeout(() => searchInput.current?.select(), 100);
       }
     },
-    // render: (text) =>
-    //   searchedColumn === dataIndex ? (
-    //     // <Highlighter
-    //     //   highlightStyle={{
-    //     //     backgroundColor: '#ffc069',
-    //     //     padding: 0,
-    //     //   }}
-    //     //   searchWords={[searchText]}
-    //     //   autoEscape
-    //     //   textToHighlight={text ? text.toString() : ''}
-    //     // />
-    //   ) : (
-    //     text
-    //   ),
   });
-
+  const mutationRefund = useMutation({
+    mutationFn: (data) => {
+      const { id, token } = data
+      return OrderService.refundOrder(id, token)
+    },
+    onSuccess: () => {
+      message.success('Hoàn tiền thành công')
+      queryOrder.refetch()
+    }
+  })
+  const mutationUpdate = useMutation({
+    mutationFn: (data) => {
+      const { id, token, ...rests } = data
+      return OrderService.updateOrderStatus(id, token, rests)
+    },
+    onSuccess: () => {
+      message.success('Cập nhật thành công')
+      queryOrder.refetch()
+    }
+  })
+  const mutationDeleteMany = useMutation({
+    mutationFn: (data) => {
+      const { ids, token } = data
+      return OrderService.deleteManyOrder({ ids }, token)
+    },
+    onSuccess: () => {
+      message.success('Xóa đơn hàng thành công')
+      queryOrder.refetch()
+    }
+  })
+  const handleDeleteManyOrders = (ids) => {
+    mutationDeleteMany.mutate({
+      ids,
+      token: user?.access_token
+    })
+  }
   const columns = [
     {
       title: 'User name',
@@ -123,6 +139,30 @@ const OrderAdmin = () => {
       ...getColumnSearchProps('address')
     },
     {
+      title: 'Status',
+      dataIndex: 'status',
+      render: (value, record) => (
+        <Select
+          value={value}
+          style={{ width: 150 }}
+          onChange={(newStatus) => {
+            mutationUpdate.mutate({
+              id: record._id,
+              token: user?.access_token,
+              status: newStatus
+            })
+          }}
+          options={[
+            { value: 'PENDING', label: 'Chờ xử lý' },
+            { value: 'CONFIRMED', label: 'Đã xác nhận' },
+            { value: 'SHIPPING', label: 'Đang giao' },
+            { value: 'DELIVERED', label: 'Đã giao' },
+            { value: 'CANCELLED', label: 'Đã hủy' }
+          ]}
+        />
+      )
+    },
+    {
       title: 'Paid',
       dataIndex: 'isPaid',
       render: (value, record) => (
@@ -139,20 +179,33 @@ const OrderAdmin = () => {
       )
     },
     {
-      title: 'Shipped',
-      dataIndex: 'isDelivered',
-      render: (value, record) => (
-        <Switch
-          checked={value}
-          onChange={(checked) => {
-            mutationUpdate.mutate({
-              id: record._id,
-              token: user?.access_token,
-              isDelivered: checked,
-            })
-          }}
-        />
-      )
+      title: 'Refund',
+      dataIndex: 'refunded',
+      render: (_, record) => {
+        if (
+          record.status === 'CANCELLED' &&
+          record.isPaid &&
+          !record.refunded
+        ) {
+          return (
+            <Button
+              danger
+              onClick={() =>
+                mutationRefund.mutate({
+                  id: record._id,
+                  token: user?.access_token
+                })
+              }
+            >
+              Hoàn tiền
+            </Button>
+          )
+        }
+        if (record.refunded) {
+          return <span style={{ color: 'green' }}>Đã hoàn</span>
+        }
+        return '-'
+      }
     },
     {
       title: 'Payment method',
@@ -168,37 +221,35 @@ const OrderAdmin = () => {
     },
   ];
 
-  const dataTable = orders?.data?.length && orders?.data?.map((order) => {
-    return {
-      ...order,
-      key: order._id,
-      userName: order?.shippingAddress?.fullName,
-      phone: order?.shippingAddress?.phone,
-      address: order?.shippingAddress?.address,
-      paymentMethod: orderContant.payment[order?.paymentMethod],
-      totalPrice: convertPrice(order?.totalPrice)
-    }
-  })
-
-  const mutationUpdate = useMutation({
-    mutationFn: (data) => {
-      const { id, token, ...rests } = data
-      return OrderService.updateOrderStatus(id, token, rests)
-    },
-    onSuccess: () => {
-      message.success('Cập nhật thành công')
-      queryOrder.refetch()
-    }
-  })
+  const dataTable = orders?.data?.map((order) => ({
+    ...order,
+    key: order._id,
+    userName: order?.shippingAddress?.fullName,
+    phone: order?.shippingAddress?.phone,
+    address: order?.shippingAddress?.address,
+    paymentMethod: orderContant.payment[order?.paymentMethod],
+    totalPrice: convertPrice(order?.totalPrice)
+  })) || []
 
   return (
     <div>
       <WrapperHeader>Quản lý đơn hàng</WrapperHeader>
       <div style={{height: 200, width:200}}>
-        <PieChartComponent data={orders?.data} />
+        <PieChartComponent data={orders?.data || []} />
       </div>
       <div style={{ marginTop: '20px' }}>
-        <TableComponent  columns={columns} isLoading={isLoadingOrders} data={dataTable} />
+        <TableComponent 
+          columns={columns} 
+          isLoading={isLoadingOrders} 
+          data={dataTable}
+          handleDelteMany={handleDeleteManyOrders}
+          onRow={(record) => {
+            return {
+              onClick: () => {
+                console.log(record._id)
+              }
+            }
+          }}/>
       </div>
     </div>
   )
