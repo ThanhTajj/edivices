@@ -139,6 +139,15 @@ const OrderAdmin = () => {
       ...getColumnSearchProps('address')
     },
     {
+      title: 'Thời gian đặt',
+      dataIndex: 'createdAt',
+      sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
+      render: (value) => {
+        const date = new Date(value)
+        return date.toLocaleString('vi-VN')
+      }
+    },
+    {
       title: 'Status',
       dataIndex: 'status',
       render: (value, record) => (
@@ -182,10 +191,12 @@ const OrderAdmin = () => {
       title: 'Refund',
       dataIndex: 'refunded',
       render: (_, record) => {
+        if (record.refunded) {
+          return <span style={{ color: 'green' }}>Đã hoàn</span>
+        }
         if (
           record.status === 'CANCELLED' &&
-          record.isPaid &&
-          !record.refunded
+          record.isPaid
         ) {
           return (
             <Button
@@ -200,9 +211,6 @@ const OrderAdmin = () => {
               Hoàn tiền
             </Button>
           )
-        }
-        if (record.refunded) {
-          return <span style={{ color: 'green' }}>Đã hoàn</span>
         }
         return '-'
       }
