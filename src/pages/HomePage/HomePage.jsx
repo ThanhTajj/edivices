@@ -13,12 +13,13 @@ import Loading from '../../components/LoadingComponent/Loading'
 import { useDebounce } from '../../hooks/useDebounce'
 import { useEffect } from 'react'
 import ProductSection from '../../components/ProductSection/ProductSection'
+import { useNavigate } from 'react-router-dom'
 
 const HomePage = () => {
   const [loading, setLoading] = useState(false)
   const [limit, setLimit] = useState(200)
   const [typeProducts, setTypeProducts] = useState([])
-
+  const navigate = useNavigate()
   const fetchProductAll = async (context) => {
     const limit = context?.queryKey && context?.queryKey[1]
     const search = context?.queryKey && context?.queryKey[2]
@@ -52,7 +53,14 @@ const HomePage = () => {
       </div>
       <div className='body' style={{ width: '100%', backgroundColor: '#ececec', paddingTop: '20px' }}>
         <div id="container" style={{ height: 'auto', width: '1310px', margin: '0 auto', backgroundColor: '#ffffff', padding: '20px' }}>
-          <SliderComponent arrImages={[slider1, slider2, slider3]} />
+          <SliderComponent
+            arrImages={[
+              { image: slider1, productId: '6998423876b8eef90d47c5a4' },
+              { image: slider2, productId: '6987112a1850bbde1ce6ff4d' },
+              { image: slider3, productId: '698711291850bbde1ce6ff4a' }
+            ]}
+            onClickItem={(id) => navigate(`/product-details/${id}`)}
+          />
           {typeProducts.map((item) => {
             return (
               <ProductSection
