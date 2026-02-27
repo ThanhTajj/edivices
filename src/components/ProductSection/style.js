@@ -2,71 +2,74 @@ import styled from "styled-components";
 import ButtonComponent from "../ButtonComponent/ButtonComponent";
 
 export const WrapperSection = styled.div`
-    margin-top: 30px;
-    background-color: #fff;
-    border-radius: 4px;
+    margin-bottom: 60px;
+    background-color: transparent;
 `
 
 export const SectionHeader = styled.div`
     display: flex;
-    align-items: center;
-    background-color: #0057D9;
-    padding: 10px 20px;
-    border-radius: 20px;
-    height: 50px;
-`
-
-export const SectionTitle = styled.div`
-    background-color: #ffc400;
-    color: #000;
-    font-weight: 700;
-    padding: 8px 20px;
-    border-radius: 20px;
-    font-size: 16px;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 20px;
-`
-
-export const SectionFilters = styled.div`
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    flex: 1;
     justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 24px;
 `
 
-export const FilterItem = styled.span`
-    color: #fff;
+export const TitleWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+`
+
+export const SectionTitle = styled.h2`
+    color: #0f172a;
+    font-weight: 800;
+    font-size: 28px;
+    margin: 0;
+`
+
+export const SectionSubtitle = styled.p`
+    color: #64748b;
+    font-size: 15px;
+    margin: 0;
+`
+
+export const ViewAllLink = styled.div`
+    color: #3b82f6;
+    font-weight: 600;
     font-size: 14px;
-    font-weight: 500;
     cursor: pointer;
-    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 
     &:hover {
+        color: #2563eb;
         text-decoration: underline;
     }
 `
 
 export const SectionBody = styled.div`
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    padding: 20px 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    padding: 10px 0;
 `
+
 export const WrapperButtonMore = styled(ButtonComponent)`
     &:hover {
         color: #fff;
-        background: #0057D9;
+        background: #3b82f6;
+        border-color: #3b82f6;
         span {
             color: #fff;
         }
     }
-    width: 100%;
-    color: #0057D9;
+    width: 200px;
+    height: 44px;
+    color: #3b82f6;
+    border: 1px solid #3b82f6;
+    border-radius: 22px;
     text-align: center;
-    cursor: ${(props) => props.disabled ? 'not-allowed' : 'pointers'}
+    font-weight: 600;
+    cursor: ${(props) => props.disabled ? 'not-allowed' : 'pointer'};
+    background: transparent;
 `

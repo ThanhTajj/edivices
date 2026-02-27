@@ -30,12 +30,12 @@ const TypeProductPage = () => {
     })
 
     const [typeProducts, setTypeProducts] = useState([])
-    
+
     const fetchAllTypeProduct = async () => {
-    const res = await ProductService.getAllTypeProduct()
-    if (res?.status === 'OK') {
-        setTypeProducts(res?.data)
-    }
+        const res = await ProductService.getAllTypeProduct()
+        if (res?.status === 'OK') {
+            setTypeProducts(res?.data)
+        }
     }
 
     useEffect(() => {
@@ -115,12 +115,12 @@ const TypeProductPage = () => {
     return (
         <Loading isLoading={loading}>
             <div style={{ width: '100%', background: '#efefef', minHeight: 'calc(100vh - 64px)' }}>
-                <div style={{background:'#f4f6f8', width:'100%', height: '54px'}}>
+                <div style={{ background: '#f4f6f8', width: '100%', padding: '20px 0' }}>
                     <div style={{ width: '1310px', margin: '0 auto', backgroundColor: '#f4f6f8' }}>
                         <WrapperTypeProduct>
                             {typeProducts.map((item) => {
                                 return (
-                                    <TypeProduct style={{backgroundColor:'none', width: '100%'}} name={item} key={item} />
+                                    <TypeProduct style={{ backgroundColor: 'none', width: '100%' }} name={item} key={item} />
                                 )
                             })}
                         </WrapperTypeProduct>
@@ -190,7 +190,7 @@ const TypeProductPage = () => {
                     </Row>
                 </div>
             </div>
-        </Loading>
+        </Loading >
     )
 }
 

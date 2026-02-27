@@ -2,43 +2,73 @@ import { Row } from "antd";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
-export const WrapperHeader = styled(Row)`
-    background-color: #0057D9;
+export const WrapperHeader = styled.div`
+    background-color: #ffffff;
+    display: flex;
     align-items: center;
-    gap: 16px;
-    flex-wrap: nowrap;
-    width: 1310px;
-    padding: 10px 0;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1310px;
+    padding: 16px 20px;
+    margin: 0 auto;
 `
 
 export const WrapperTextHeader = styled(Link)`
-    font-size: 18px;
-    color: #fff;
-    font-weight: bold;
-    text-align: left;
+    font-size: 22px;
+    color: #111;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
     &:hover {
-        font-size: 18px;
-        color: #fff;
+        color: #111;
     }
 `
 
-export const WrapperHeaderAccout = styled.div`
+export const WrapperHeaderAccount = styled.div`
     display: flex;
     align-items: center;
-    color: #fff;
-    gap: 10px;
-    max-width: 200px;
+    color: #333;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: 500;
 `
 
-export const WrapperTextHeaderSmall = styled.span`
-    font-size: 12px;
-    color: #fff;
-    white-space: nowrap;
+export const WrapperNavLinks = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 24px;
+`
+
+export const NavLink = styled.span`
+    font-size: 15px;
+    font-weight: 600;
+    color: ${props => props.active ? '#2b6cb0' : '#666'};
+    background-color: ${props => props.active ? '#ebf4ff' : 'transparent'};
+    padding: 8px 20px;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    &:hover {
+        color: #2b6cb0;
+        background-color: #ebf4ff;
+    }
+`
+
+export const WrapperRight = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 24px;
 `
 
 export const WrapperContentPopup = styled.p`
     cursor: pointer;
+    padding: 8px 12px;
+    margin: 0;
+    border-radius: 4px;
     &:hover {
-        color: rgb(26, 148, 255);
+        background-color: #f5f5f5;
+        color: #2b6cb0;
     }
 `

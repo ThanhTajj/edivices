@@ -21,7 +21,7 @@ export const WrapperInfoUser = styled.div`
   .status-payment {
     margin-top: 8px;
     font-size: 14px;
-    color: rgb(234, 133, 0); 
+    color: rgba(0, 234, 62, 1); 
   }
 `
 

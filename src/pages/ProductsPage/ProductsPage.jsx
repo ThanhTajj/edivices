@@ -1,8 +1,128 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { Select, Input } from 'antd'
+import { SearchOutlined } from '@ant-design/icons'
+import { useLocation } from 'react-router-dom'
+import { PageWrapper, PageHeader, PageTitle, PageSubtitle, ControlsWrapper, FilterPills, Pill, ProductGrid, SearchInputWrapper } from './style'
+import CardComponent from '../../components/CardComponent/CardComponent'
+import Loading from '../../components/LoadingComponent/Loading'
+import * as ProductService from '../../services/ProductService'
+import { useQuery } from '@tanstack/react-query'
 
 const ProductsPage = () => {
+  const location = useLocation()
+  const [activeTab, setActiveTab] = useState(location.state || 'All')
+  const [typeProducts, setTypeProducts] = useState([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [sortOrder, setSortOrder] = useState('Newest')
+
+  const fetchProductAll = async (context) => {
+    const res = await ProductService.getAllProduct()
+    return res
+  }
+
+  const fetchAllTypeProduct = async () => {
+    const res = await ProductService.getAllTypeProduct()
+    if (res?.status === 'OK') {
+      setTypeProducts(['All', ...res?.data])
+    }
+  }
+
+  const { isLoading, data: products } = useQuery(['products'], fetchProductAll, { retry: 3 })
+
+  useEffect(() => {
+    fetchAllTypeProduct()
+  }, [])
+
+  useEffect(() => {
+    if (location.state) {
+      setActiveTab(location.state)
+    }
+  }, [location.state])
+
+  // Filter and Sort Logic
+  const allProducts = products?.data || []
+
+  let filteredProducts = allProducts.filter(item => {
+    if (activeTab !== 'All' && item.type !== activeTab) return false;
+    if (searchTerm && !item.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+    return true;
+  })
+
+  // Basic sorting simulation
+  if (sortOrder === 'Highest Price') {
+    filteredProducts.sort((a, b) => b.price - a.price)
+  } else if (sortOrder === 'Lowest Price') {
+    filteredProducts.sort((a, b) => a.price - b.price)
+  }
+
   return (
-    <div>ProductsPage</div>
+    <Loading isLoading={isLoading}>
+      <div style={{ width: '100%', background: '#ffffff', minHeight: '100vh' }}>
+        <PageWrapper>
+          <PageHeader>
+            <PageTitle>All Products</PageTitle>
+            <PageSubtitle>{filteredProducts.length} products found</PageSubtitle>
+          </PageHeader>
+
+          <ControlsWrapper>
+            <SearchInputWrapper>
+              <Input
+                size="large"
+                placeholder="Search products..."
+                prefix={<SearchOutlined style={{ color: '#94a3b8' }} />}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{ borderRadius: '8px' }}
+              />
+            </SearchInputWrapper>
+            <div>
+              <Select
+                defaultValue="Newest"
+                style={{ width: 160 }}
+                size="large"
+                onChange={(value) => setSortOrder(value)}
+                options={[
+                  { value: 'Newest', label: 'Newest' },
+                  { value: 'Highest Price', label: 'Price: High to Low' },
+                  { value: 'Lowest Price', label: 'Price: Low to High' },
+                ]}
+              />
+            </div>
+          </ControlsWrapper>
+
+          <FilterPills>
+            {typeProducts.map(type => (
+              <Pill
+                key={type}
+                active={activeTab === type}
+                onClick={() => setActiveTab(type)}
+              >
+                {type}
+              </Pill>
+            ))}
+          </FilterPills>
+
+          <ProductGrid>
+            {filteredProducts.map(product => (
+              <CardComponent
+                key={product._id}
+                countInStock={product.countInStock}
+                description={product.description}
+                image={product.image}
+                name={product.name}
+                price={product.price}
+                rating={product.rating}
+                type={product.type}
+                selled={product.selled}
+                discount={product.discount}
+                id={product._id}
+              />
+            ))}
+          </ProductGrid>
+
+        </PageWrapper>
+      </div>
+    </Loading>
   )
 }
 

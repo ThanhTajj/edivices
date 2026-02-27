@@ -22,9 +22,12 @@ const SliderComponent = ({ arrImages, onClickItem }) => {
             alt="slider"
             preview={false}
             width="100%"
-            height={274}
+            height={400}
             style={{
-              cursor: 'pointer'
+              cursor: 'pointer',
+              objectFit: 'contain',
+              backgroundColor: 'transparent',
+              display: 'block'
             }}
             onClick={() => onClickItem && onClickItem(item.productId)}
           />

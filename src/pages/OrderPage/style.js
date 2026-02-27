@@ -94,3 +94,45 @@ export const CustomCheckbox = styled(Checkbox)`
     border-color: #0057D9;
   }
 `
+
+export const EmptyCartWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  background: #ffffff;
+  border-radius: 24px;
+  margin: 40px auto;
+  max-width: 800px;
+  text-align: center;
+`
+
+export const EmptyCartIcon = styled.div`
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  
+  svg {
+    font-size: 40px;
+    color: #64748b;
+  }
+`
+
+export const EmptyCartTitle = styled.h2`
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 12px 0;
+`
+
+export const EmptyCartSubtitle = styled.p`
+  font-size: 16px;
+  color: #64748b;
+  margin: 0 0 32px 0;
+`

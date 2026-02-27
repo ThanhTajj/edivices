@@ -5,7 +5,7 @@ export const WrapperTypeProduct = styled.div`
     align-items: center;
     gap: 16px;
     justify-content: flex-start;
-    height: 44px;
+    flex-wrap: wrap;
     border-bottom: 1px solid #e5e5e5;
     padding-bottom: 10px;
     margin-bottom: 10px;

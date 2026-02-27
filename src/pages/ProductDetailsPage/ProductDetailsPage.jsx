@@ -25,12 +25,12 @@ const ProductDetailsPage = () => {
   const navigate = useNavigate()
   return (
     <div style={{ width: '100%', background: '#efefef', height: '100%' }}>
-      <div style={{background:'#f4f6f8', width:'100%', height: '54px'}}>
+      <div style={{ background: '#f4f6f8', width: '100%', padding: '20px 0' }}>
         <div style={{ width: '1310px', margin: '0 auto', backgroundColor: '#f4f6f8' }}>
           <WrapperTypeProduct>
             {typeProducts.map((item) => {
               return (
-                <TypeProduct style={{backgroundColor:'none', width: '100%'}} name={item} key={item} />
+                <TypeProduct style={{ backgroundColor: 'none', width: '100%' }} name={item} key={item} />
               )
             })}
           </WrapperTypeProduct>

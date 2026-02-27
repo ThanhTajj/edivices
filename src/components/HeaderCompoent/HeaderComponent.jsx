@@ -1,25 +1,21 @@
-import { Badge, Button, Col, Popover } from 'antd'
-import React from 'react'
-import { WrapperContentPopup, WrapperHeader, WrapperHeaderAccout, WrapperTextHeader, WrapperTextHeaderSmall } from './style'
+import { Badge, Popover } from 'antd'
+import React, { useState, useEffect } from 'react'
+import { WrapperContentPopup, WrapperHeader, WrapperHeaderAccount, WrapperTextHeader, WrapperNavLinks, NavLink, WrapperRight } from './style'
 import {
   UserOutlined,
-  CaretDownOutlined,
-  ShoppingCartOutlined
+  ShoppingCartOutlined,
+  ThunderboltFilled
 } from '@ant-design/icons';
-import ButttonInputSearch from '../ButtonInputSearch/ButttonInputSearch';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import * as UserService from '../../services/UserService'
 import { resetUser } from '../../redux/slides/userSlide'
-import { useState } from 'react';
 import Loading from '../LoadingComponent/Loading';
-import { useEffect } from 'react';
-import SearchBoxComponent from '../SearchBoxComponent/SearchBoxComponent';
-import { useRef } from 'react'
 import { resetOrder } from '../../redux/slides/orderSlide';
 
 const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const navigate = useNavigate()
+  const location = useLocation()
   const user = useSelector((state) => state.user)
   const dispatch = useDispatch()
   const [userName, setUserName] = useState('')
@@ -27,8 +23,6 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const [isOpenPopup, setIsOpenPopup] = useState(false)
   const order = useSelector((state) => state.order)
   const [loading, setLoading] = useState(false)
-  const [showSearch, setShowSearch] = useState(false)
-  const searchRef = useRef(null)
 
   const handleNavigateLogin = () => {
     navigate('/sign-in')
@@ -50,17 +44,6 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
     setUserAvatar(user?.avatar)
     setLoading(false)
   }, [user?.name, user?.avatar])
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (searchRef.current && !searchRef.current.contains(e.target)) {
-        setShowSearch(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
 
   const content = (
     <div>
@@ -90,76 +73,76 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
     }
     setIsOpenPopup(false)
   };
-  
+
   return (
-    <div style={{ heiht: '100%', width: '100%', display: 'flex', background: '#0057D9', justifyContent: 'center' }}>
-      <WrapperHeader style={{ justifyContent: isHiddenSearch && isHiddenSearch ? 'space-between' : 'unset' }}>
-        <Col span={5}>
-          <WrapperTextHeader to='/'>Edivices</WrapperTextHeader>
-        </Col>
-        {!isHiddenSearch && (
-          <Col span={11}>
-            <div style={{ position: 'relative' }} ref={searchRef}>
-              <SearchBoxComponent
-                show={showSearch}
-                setShow={setShowSearch}
-              />
+    <div style={{ width: '100%', display: 'flex', background: '#ffffff', justifyContent: 'center', borderBottom: '1px solid #f0f0f0' }}>
+      <WrapperHeader>
+        {/* Logo */}
+        <WrapperTextHeader to='/'>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            background: '#3b82f6',
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            transform: 'rotate(-10deg)'
+          }}>
+            <ThunderboltFilled style={{ fontSize: '18px' }} />
+          </div>
+          Edivices
+        </WrapperTextHeader>
+
+        {/* Navigation */}
+        <WrapperNavLinks>
+          <NavLink active={location.pathname === '/'} onClick={() => navigate('/')}>Home</NavLink>
+          <NavLink active={location.pathname === '/products'} onClick={() => navigate('/products')}>Products</NavLink>
+          <NavLink active={location.pathname === '/order'} onClick={() => navigate('/order')}>Cart</NavLink>
+        </WrapperNavLinks>
+
+        {/* Right Actions */}
+        <WrapperRight>
+          {!isHiddenCart && (
+            <div onClick={() => navigate('/order')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', marginRight: '16px' }}>
+              <Badge count={order?.orderItems?.length} size="small" offset={[-2, 2]}>
+                <ShoppingCartOutlined style={{ fontSize: '22px', color: '#333' }} />
+              </Badge>
             </div>
-          </Col>
-        )}
-        <Col span={8} style={{ display: 'flex', gap: '54px', alignItems: 'center', marginLeft: '40px' }}>
+          )}
+
           <Loading isLoading={loading}>
-            <WrapperHeaderAccout>
+            <WrapperHeaderAccount>
               {userAvatar ? (
                 <img src={userAvatar} alt="avatar" style={{
-                  height: '30px',
-                  width: '30px',
+                  height: '32px',
+                  width: '32px',
                   borderRadius: '50%',
                   objectFit: 'cover'
                 }} />
               ) : (
-                <UserOutlined style={{ fontSize: '30px' }} />
+                <UserOutlined style={{ fontSize: '20px' }} />
               )}
-              {user?.email ? (
-                <>
-                  <Popover
-                    content={content}
-                    trigger="click"
-                    open={isOpenPopup}
-                    onOpenChange={(open) => setIsOpenPopup(open)}
-                  >
-                    <div
-                      style={{
-                        cursor: 'pointer',
-                        maxWidth: 120,
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap'
-                      }}
-                    >
-                      {userName?.length ? userName : user?.email}
-                    </div>
-                  </Popover>
-                </>
-              ) : (
-                <div onClick={handleNavigateLogin} style={{ cursor: 'pointer' }}>
-                  <WrapperTextHeaderSmall>Đăng nhập/Đăng ký</WrapperTextHeaderSmall>
-                  <div>
-                    <WrapperTextHeaderSmall>Tài khoản</WrapperTextHeaderSmall>
-                    <CaretDownOutlined />
+              {user?.access_token ? (
+                <Popover
+                  content={content}
+                  trigger="click"
+                  open={isOpenPopup}
+                  onOpenChange={(open) => setIsOpenPopup(open)}
+                >
+                  <div style={{ maxWidth: 120, overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                    {userName?.length ? userName : user?.email || 'User'}
                   </div>
+                </Popover>
+              ) : (
+                <div onClick={handleNavigateLogin} style={{ fontSize: '14px' }}>
+                  Login
                 </div>
               )}
-            </WrapperHeaderAccout>
+            </WrapperHeaderAccount>
           </Loading>
-          {!isHiddenCart && (
-            <div onClick={() => navigate('/order')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Badge count={order?.orderItems?.length} size="small">
-                <ShoppingCartOutlined style={{ fontSize: '30px', color: '#fff' }} />
-              </Badge>
-              <WrapperTextHeaderSmall>Giỏ hàng</WrapperTextHeaderSmall>
-            </div>
-          )}
-        </Col>
+        </WrapperRight>
       </WrapperHeader>
     </div>
   )
