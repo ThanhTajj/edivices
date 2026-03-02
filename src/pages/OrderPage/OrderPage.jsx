@@ -356,7 +356,8 @@ const OrderPage = () => {
                   height: '48px',
                   width: '320px',
                   border: 'none',
-                  borderRadius: '4px'
+                  borderRadius: '4px',
+                  color: '#fff',
                 }}
                 textButton={'Mua hàng'}
               />

@@ -6,13 +6,47 @@ import {
 import { StarFilled, ShoppingCartOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { convertPrice } from '../../utils'
+import { useDispatch, useSelector } from 'react-redux'
+import { addOrderProduct } from '../../redux/slides/orderSlide'
 
 const CardComponent = (props) => {
     const { countInStock, description, image, name, price, rating, type, discount, selled, id } = props
     const navigate = useNavigate()
+    const dispatch = useDispatch()
+    const user = useSelector((state) => state.user)
 
     const handleDetailsProduct = (id) => {
         navigate(`/product-details/${id}`)
+    }
+
+    const handleAddToCart = () => {
+        if (!user?.id) {
+            navigate('/sign-in', {
+                state: {
+                    redirectAddToCart: {
+                        product: id,
+                        name,
+                        image,
+                        price: finalPrice,
+                        amount: 1,
+                        countInstock: countInStock
+                    }
+                }
+            })
+            return
+        }
+
+        dispatch(addOrderProduct({
+            orderItem: {
+                product: id,
+                name,
+                image,
+                price: finalPrice,
+                amount: 1,
+                countInstock: countInStock
+            },
+            userId: user.id
+        }))
     }
 
     const finalPrice = discount > 0 ? price - (price * discount) / 100 : price;
@@ -39,7 +73,7 @@ const CardComponent = (props) => {
             <BottomRow>
                 <PriceSection>
                     {discount > 0 ? (
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <WrapperPriceText>{convertPrice(finalPrice)}</WrapperPriceText>
                             <OriginalPrice>{convertPrice(price)}</OriginalPrice>
                         </div>
@@ -48,15 +82,15 @@ const CardComponent = (props) => {
                     )}
                 </PriceSection>
 
-                <CartButton onClick={(e) => {
-                    e.stopPropagation();
-                    // Optional: handle direct add to cart logic here if available as prop
-                    handleDetailsProduct(id)
-                }}>
+                <CartButton
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        handleAddToCart()
+                    }}
+                >
                     <ShoppingCartOutlined />
                 </CartButton>
             </BottomRow>
-
         </WrapperCardStyle>
     )
 }

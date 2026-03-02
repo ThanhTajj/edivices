@@ -114,7 +114,7 @@ export const OriginalPrice = styled.div`
     font-size: 13px;
     text-decoration: line-through;
     font-weight: 500;
-    margin-left: 8px;
+    margin-left: 1px;
 `
 
 export const CartButton = styled.div`

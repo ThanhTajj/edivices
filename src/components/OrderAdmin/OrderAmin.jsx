@@ -163,7 +163,6 @@ const OrderAdmin = () => {
               status: newStatus
             };
 
-            // If paying by QR and status is CONFIRMED, mark as paid
             if (newStatus === 'CONFIRMED' && record.paymentMethod === orderContant.payment['qr']) {
               updatePayload.isPaid = true;
             }
@@ -255,7 +254,6 @@ const OrderAdmin = () => {
     <div>
       <WrapperHeader>Quản lý đơn hàng</WrapperHeader>
 
-      {/* Stat cards */}
       <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
         <div style={{
           flex: 1, minWidth: 200, background: 'linear-gradient(135deg,#6366f1,#818cf8)',
@@ -273,9 +271,8 @@ const OrderAdmin = () => {
         </div>
       </div>
 
-      {/* Charts grid */}
       <div style={{ display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap' }}>
-        {/* Pie chart */}
+
         <div style={{ flex: 1, minWidth: 260, background: '#fff', borderRadius: 16, padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }}>
           <div style={{ fontWeight: 600, marginBottom: 12, color: '#374151' }}>Phương thức thanh toán</div>
           <div style={{ height: 220 }}>
@@ -283,7 +280,6 @@ const OrderAdmin = () => {
           </div>
         </div>
 
-        {/* Bar chart top products */}
         <div style={{ flex: 2, minWidth: 360, background: '#fff', borderRadius: 16, padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }}>
           <div style={{ fontWeight: 600, marginBottom: 12, color: '#374151' }}>Top 5 sản phẩm bán chạy</div>
           <div style={{ height: 260 }}>

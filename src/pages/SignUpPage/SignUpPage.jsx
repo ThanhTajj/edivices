@@ -13,6 +13,8 @@ import { useDispatch } from 'react-redux'
 import jwtDecode from 'jwt-decode'
 import { loadCart } from '../../redux/slides/orderSlide'
 import { updateUser } from '../../redux/slides/userSlide'
+import { useLocation } from 'react-router-dom'
+import { addOrderProduct } from '../../redux/slides/orderSlide'
 
 const SignUpPage = () => {
   const [email, setEmail] = useState('')
@@ -21,6 +23,7 @@ const SignUpPage = () => {
 
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const location = useLocation()
 
   const mutation = useMutationHooks(
     data => UserService.signupUser(data)
@@ -48,7 +51,13 @@ const SignUpPage = () => {
     const res = await UserService.getDetailsUser(id, token)
     dispatch(updateUser({ ...res?.data, access_token: token }))
     dispatch(loadCart({ userId: id }))
-    navigate('/')
+    if (location.state?.redirectAddToCart) {
+      dispatch(addOrderProduct({
+        orderItem: location.state.redirectAddToCart,
+        userId: id
+      }))
+    }
+    navigate('/', { replace: true })
   }
 
   const handleNavigateSignIn = () => {

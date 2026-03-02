@@ -3,6 +3,7 @@ import styled from 'styled-components'
 export const WrapperFooter = styled.div`
   background: #001529;
   color: #fff;
+  margin-top: 40px;
 `
 
 export const WrapperFooterContent = styled.div`

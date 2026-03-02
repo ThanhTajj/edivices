@@ -50,8 +50,6 @@ const HomePage = () => {
     <Loading isLoading={isLoading || loading}>
       <div style={{ width: '100%', backgroundColor: '#ffffff', minHeight: '100vh', paddingBottom: '60px' }}>
         <div id="container" style={{ width: '1310px', margin: '0 auto' }}>
-
-          {/* Hero Section */}
           <WrapperHero>
             <HeroContent>
               <HeroTag>
@@ -76,15 +74,14 @@ const HomePage = () => {
             <div style={{ width: '50%', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
               <SliderComponent
                 arrImages={[
-                  { productId: '1', image: slider1 },
-                  { productId: '2', image: slider2 },
-                  { productId: '3', image: slider3 },
+                  { image: slider1, productId: '6998423876b8eef90d47c5a4' },
+                  { image: slider2, productId: '6987112a1850bbde1ce6ff4d' },
+                  { image: slider3, productId: '698711291850bbde1ce6ff4a' }
                 ]}
+                onClickItem={(id) => navigate(`/product-details/${id}`)}
               />
             </div>
           </WrapperHero>
-
-          {/* Features Section */}
           <WrapperFeatures>
             <FeatureItem>
               <FeatureIcon><CarOutlined /></FeatureIcon>
@@ -115,8 +112,6 @@ const HomePage = () => {
               </FeatureText>
             </FeatureItem>
           </WrapperFeatures>
-
-          {/* Featured Picks */}
           <div id="featured-products" style={{ marginTop: '40px' }}>
             {typeProducts.map((item) => {
               return (
@@ -128,8 +123,6 @@ const HomePage = () => {
               )
             })}
           </div>
-
-          {/* Shop By Category */}
           <div style={{ marginTop: '80px', marginBottom: '40px' }}>
             <SubTitleSection>Mua theo danh mục</SubTitleSection>
             <DescSection>Tìm chính xác thứ bạn cần</DescSection>
@@ -141,7 +134,6 @@ const HomePage = () => {
               })}
             </WrapperTypeProduct>
           </div>
-
         </div>
       </div>
     </Loading>

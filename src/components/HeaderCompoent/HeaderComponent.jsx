@@ -77,7 +77,6 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   return (
     <div style={{ width: '100%', display: 'flex', background: '#ffffff', justifyContent: 'center', borderBottom: '1px solid #f0f0f0' }}>
       <WrapperHeader>
-        {/* Logo */}
         <WrapperTextHeader to='/'>
           <div style={{
             width: '32px',
@@ -95,14 +94,11 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
           Edivices
         </WrapperTextHeader>
 
-        {/* Navigation */}
         <WrapperNavLinks>
-          <NavLink active={location.pathname === '/'} onClick={() => navigate('/')}>Home</NavLink>
-          <NavLink active={location.pathname === '/products'} onClick={() => navigate('/products')}>Products</NavLink>
-          <NavLink active={location.pathname === '/order'} onClick={() => navigate('/order')}>Cart</NavLink>
+          <NavLink active={location.pathname === '/'} onClick={() => navigate('/')}>Trang chủ</NavLink>
+          <NavLink active={location.pathname === '/products'} onClick={() => navigate('/products')}>Sản phẩm</NavLink>
         </WrapperNavLinks>
 
-        {/* Right Actions */}
         <WrapperRight>
           {!isHiddenCart && (
             <div onClick={() => navigate('/order')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', marginRight: '16px' }}>
@@ -114,16 +110,6 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
 
           <Loading isLoading={loading}>
             <WrapperHeaderAccount>
-              {userAvatar ? (
-                <img src={userAvatar} alt="avatar" style={{
-                  height: '32px',
-                  width: '32px',
-                  borderRadius: '50%',
-                  objectFit: 'cover'
-                }} />
-              ) : (
-                <UserOutlined style={{ fontSize: '20px' }} />
-              )}
               {user?.access_token ? (
                 <Popover
                   content={content}
@@ -131,12 +117,29 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                   open={isOpenPopup}
                   onOpenChange={(open) => setIsOpenPopup(open)}
                 >
-                  <div style={{ maxWidth: 120, overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                    {userName?.length ? userName : user?.email || 'User'}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+                    {userAvatar ? (
+                      <img
+                        src={userAvatar}
+                        alt="avatar"
+                        style={{
+                          height: '32px',
+                          width: '32px',
+                          borderRadius: '50%',
+                          objectFit: 'cover'
+                        }}
+                      />
+                    ) : (
+                      <UserOutlined style={{ fontSize: '20px' }} />
+                    )}
+
+                    <div style={{ maxWidth: 120, overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                      {userName?.length ? userName : user?.email || 'User'}
+                    </div>
                   </div>
                 </Popover>
               ) : (
-                <div onClick={handleNavigateLogin} style={{ fontSize: '14px' }}>
+                <div onClick={handleNavigateLogin} style={{ fontSize: '14px', cursor: 'pointer' }}>
                   Login
                 </div>
               )}

@@ -45,7 +45,6 @@ export const userSlide = createSlice({
     },
 })
 
-// Action creators are generated for each case reducer function
 export const { updateUser, resetUser } = userSlide.actions
 
 export default userSlide.reducer

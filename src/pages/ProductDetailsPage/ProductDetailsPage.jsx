@@ -25,8 +25,8 @@ const ProductDetailsPage = () => {
   const navigate = useNavigate()
   return (
     <div style={{ width: '100%', background: '#efefef', height: '100%' }}>
-      <div style={{ background: '#f4f6f8', width: '100%', padding: '20px 0' }}>
-        <div style={{ width: '1310px', margin: '0 auto', backgroundColor: '#f4f6f8' }}>
+      <div style={{ background: '#fff', width: '100%', padding: '20px 0' }}>
+        <div style={{ width: '1310px', margin: '0 auto', backgroundColor: '#fff' }}>
           <WrapperTypeProduct>
             {typeProducts.map((item) => {
               return (

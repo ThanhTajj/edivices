@@ -6,7 +6,6 @@ import {
 const COLORS = ['#6366f1', '#3b82f6', '#10b981', '#f59e0b', '#ef4444']
 
 const BarChartTopProducts = ({ orders }) => {
-    // Tính số lượng bán của từng sản phẩm từ danh sách đơn hàng
     const productMap = {}
         ; (orders || []).forEach((order) => {
             ; (order.orderItems || []).forEach((item) => {

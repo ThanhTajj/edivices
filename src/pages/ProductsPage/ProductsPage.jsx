@@ -39,7 +39,6 @@ const ProductsPage = () => {
     }
   }, [location.state])
 
-  // Filter and Sort Logic
   const allProducts = products?.data || []
 
   let filteredProducts = allProducts.filter(item => {
@@ -48,7 +47,6 @@ const ProductsPage = () => {
     return true;
   })
 
-  // Basic sorting simulation
   if (sortOrder === 'Highest Price') {
     filteredProducts.sort((a, b) => b.price - a.price)
   } else if (sortOrder === 'Lowest Price') {
@@ -60,8 +58,8 @@ const ProductsPage = () => {
       <div style={{ width: '100%', background: '#ffffff', minHeight: '100vh' }}>
         <PageWrapper>
           <PageHeader>
-            <PageTitle>All Products</PageTitle>
-            <PageSubtitle>{filteredProducts.length} products found</PageSubtitle>
+            <PageTitle>Tất cả sản phẩm</PageTitle>
+            <PageSubtitle>{filteredProducts.length} sản phẩm</PageSubtitle>
           </PageHeader>
 
           <ControlsWrapper>
@@ -82,9 +80,9 @@ const ProductsPage = () => {
                 size="large"
                 onChange={(value) => setSortOrder(value)}
                 options={[
-                  { value: 'Newest', label: 'Newest' },
-                  { value: 'Highest Price', label: 'Price: High to Low' },
-                  { value: 'Lowest Price', label: 'Price: Low to High' },
+                  { value: 'Newest', label: 'Mới nhất' },
+                  { value: 'Highest Price', label: 'Giá: Cao đến Thấp' },
+                  { value: 'Lowest Price', label: 'Giá: Thấp đến Cao' },
                 ]}
               />
             </div>
