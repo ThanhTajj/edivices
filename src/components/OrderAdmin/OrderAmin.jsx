@@ -16,6 +16,8 @@ import { DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons'
 import { useSelector } from 'react-redux'
 import { orderContant } from '../../contant'
 import PieChartComponent from './PieChart'
+import BarChartTopProducts from './BarChartTopProducts'
+
 
 const OrderAdmin = () => {
   const user = useSelector((state) => state?.user)
@@ -155,11 +157,15 @@ const OrderAdmin = () => {
           value={value}
           style={{ width: 150 }}
           onChange={(newStatus) => {
-            mutationUpdate.mutate({
+            let updatePayload = {
               id: record._id,
               token: user?.access_token,
               status: newStatus
-            })
+            };
+            if (newStatus === 'CONFIRMED' && record.paymentMethod === orderContant.payment['qr']) {
+              updatePayload.isPaid = true;
+            }
+            mutationUpdate.mutate(updatePayload)
           }}
           options={[
             { value: 'PENDING', label: 'Chờ xử lý' },
@@ -239,16 +245,50 @@ const OrderAdmin = () => {
     totalPrice: convertPrice(order?.totalPrice)
   })) || []
 
+  const totalRevenue = (orders?.data || []).reduce((sum, o) => sum + (o.totalPrice || 0), 0)
+  const totalOrders = orders?.data?.length || 0
+
   return (
     <div>
       <WrapperHeader>Quản lý đơn hàng</WrapperHeader>
-      <div style={{height: 200, width:200}}>
-        <PieChartComponent data={orders?.data || []} />
+
+      <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
+        <div style={{
+          flex: 1, minWidth: 200, background: 'linear-gradient(135deg,#6366f1,#818cf8)',
+          borderRadius: 16, padding: '20px 24px', color: '#fff', boxShadow: '0 4px 16px rgba(99,102,241,0.3)'
+        }}>
+          <div style={{ fontSize: 14, opacity: 0.85, marginBottom: 8 }}>Tổng đơn hàng</div>
+          <div style={{ fontSize: 32, fontWeight: 700 }}>{totalOrders}</div>
+        </div>
+        <div style={{
+          flex: 1, minWidth: 200, background: 'linear-gradient(135deg,#10b981,#34d399)',
+          borderRadius: 16, padding: '20px 24px', color: '#fff', boxShadow: '0 4px 16px rgba(16,185,129,0.3)'
+        }}>
+          <div style={{ fontSize: 14, opacity: 0.85, marginBottom: 8 }}>Tổng doanh thu</div>
+          <div style={{ fontSize: 28, fontWeight: 700 }}>{convertPrice(totalRevenue)}</div>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap' }}>
+
+        <div style={{ flex: 1, minWidth: 260, background: '#fff', borderRadius: 16, padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }}>
+          <div style={{ fontWeight: 600, marginBottom: 12, color: '#374151' }}>Phương thức thanh toán</div>
+          <div style={{ height: 220 }}>
+            <PieChartComponent data={orders?.data || []} />
+          </div>
+        </div>
+
+        <div style={{ flex: 2, minWidth: 360, background: '#fff', borderRadius: 16, padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }}>
+          <div style={{ fontWeight: 600, marginBottom: 12, color: '#374151' }}>Top 5 sản phẩm bán chạy</div>
+          <div style={{ height: 260 }}>
+            <BarChartTopProducts orders={orders?.data || []} />
+          </div>
+        </div>
       </div>
       <div style={{ marginTop: '20px' }}>
-        <TableComponent 
-          columns={columns} 
-          isLoading={isLoadingOrders} 
+        <TableComponent
+          columns={columns}
+          isLoading={isLoadingOrders}
           data={dataTable}
           handleDelteMany={handleDeleteManyOrders}
           onRow={(record) => {
@@ -257,7 +297,7 @@ const OrderAdmin = () => {
                 console.log(record._id)
               }
             }
-          }}/>
+          }} />
       </div>
     </div>
   )
