@@ -48,6 +48,17 @@ const HomePage = () => {
 
   return (
     <Loading isLoading={isLoading || loading}>
+      <div style={{ background: '#fff', width: '100%', padding: '20px 0' }}>
+        <div style={{ width: '1310px', margin: '0 auto', backgroundColor: '#fff' }}>
+          <WrapperTypeProduct>
+            {typeProducts.map((item) => {
+              return (
+                <TypeProduct style={{ backgroundColor: 'none', width: '100%' }} name={item} key={item} />
+              )
+            })}
+          </WrapperTypeProduct>
+        </div>
+      </div>
       <div style={{ width: '100%', backgroundColor: '#ffffff', minHeight: '100vh', paddingBottom: '60px' }}>
         <div id="container" style={{ width: '1310px', margin: '0 auto' }}>
           <WrapperHero>
@@ -122,17 +133,6 @@ const HomePage = () => {
                 />
               )
             })}
-          </div>
-          <div style={{ marginTop: '80px', marginBottom: '40px' }}>
-            <SubTitleSection>Mua theo danh mục</SubTitleSection>
-            <DescSection>Tìm chính xác thứ bạn cần</DescSection>
-            <WrapperTypeProduct>
-              {typeProducts.map((item) => {
-                return (
-                  <TypeProduct name={item} key={item} />
-                )
-              })}
-            </WrapperTypeProduct>
           </div>
         </div>
       </div>

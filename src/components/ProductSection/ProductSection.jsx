@@ -50,7 +50,7 @@ const ProductSection = ({ title, subtitle = "Handpicked products you'll love", p
                     <SectionSubtitle>{subtitle}</SectionSubtitle>
                 </TitleWrapper>
                 <ViewAllLink onClick={handleNavigate}>
-                    View All <ArrowRightOutlined />
+                    Xem tất cả <ArrowRightOutlined />
                 </ViewAllLink>
             </SectionHeader>
             <SectionBody>
@@ -75,7 +75,7 @@ const ProductSection = ({ title, subtitle = "Handpicked products you'll love", p
             {products?.length > visibleCount && (
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24 }}>
                     <WrapperButtonMore
-                        textButton="Show More"
+                        textButton="Xem thêm"
                         type="outline"
                         onClick={() => setVisibleCount(prev => prev + 4)}
                     />

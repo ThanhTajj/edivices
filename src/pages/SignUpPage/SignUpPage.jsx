@@ -13,8 +13,6 @@ import { useDispatch } from 'react-redux'
 import jwtDecode from 'jwt-decode'
 import { loadCart } from '../../redux/slides/orderSlide'
 import { updateUser } from '../../redux/slides/userSlide'
-import { useLocation } from 'react-router-dom'
-import { addOrderProduct } from '../../redux/slides/orderSlide'
 
 const SignUpPage = () => {
   const [email, setEmail] = useState('')
@@ -23,7 +21,6 @@ const SignUpPage = () => {
 
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const location = useLocation()
 
   const mutation = useMutationHooks(
     data => UserService.signupUser(data)
@@ -31,19 +28,29 @@ const SignUpPage = () => {
 
   const {data, isPending, isSuccess, isError} = mutation
 
+  const decodeTokenSafe = (token) => {
+    try {
+      if (!token || token === 'undefined' || token === 'null') return null
+      return jwtDecode(token)
+    } catch (error) {
+      console.log('Token decode error:', error)
+      return null
+    }
+  }
+
   useEffect(() => {
-    if (data?.access_token) {
+    if (!data) return
+    if (data?.status === 'ERR') {
+      message.error(data?.message)
+      return
+    }
+    if (data?.status === 'OK' && data?.access_token) {
       message.success('Đăng ký thành công!')
-
-      localStorage.setItem('access_token', JSON.stringify(data.access_token))
-
-      const decoded = jwtDecode(data.access_token)
-
+      localStorage.setItem('access_token', data.access_token)
+      const decoded = decodeTokenSafe(data.access_token)
       if (decoded?.id) {
         handleGetDetailsUser(decoded.id, data.access_token)
       }
-    } else if (data?.status === 'ERR') {
-      message.error(data?.message)
     }
   }, [data])
 
@@ -51,13 +58,7 @@ const SignUpPage = () => {
     const res = await UserService.getDetailsUser(id, token)
     dispatch(updateUser({ ...res?.data, access_token: token }))
     dispatch(loadCart({ userId: id }))
-    if (location.state?.redirectAddToCart) {
-      dispatch(addOrderProduct({
-        orderItem: location.state.redirectAddToCart,
-        userId: id
-      }))
-    }
-    navigate('/', { replace: true })
+    navigate('/')
   }
 
   const handleNavigateSignIn = () => {

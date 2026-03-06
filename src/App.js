@@ -25,33 +25,50 @@ function App() {
   }, [])
 
   const handleDecoded = () => {
-    let storageData = user?.access_token || localStorage.getItem('access_token')
-    let decoded = {}
-    if (storageData && isJsonString(storageData) && !user?.access_token) {
-      storageData = JSON.parse(storageData)
-      decoded = jwt_decode(storageData)
+    const token = user?.access_token || localStorage.getItem('access_token')
+    if (!token) return { decoded: null, storageData: null }
+    try {
+      const parsedToken = isJsonString(token) ? JSON.parse(token) : token
+      const decoded = jwt_decode(parsedToken)
+      return { decoded, storageData: parsedToken }
+    } catch {
+      return { decoded: null, storageData: null }
     }
-    return { decoded, storageData }
   }
 
-  UserService.axiosJWT.interceptors.request.use(async (config) => {
-    const currentTime = new Date()
-    const { decoded } = handleDecoded()
-    let storageRefreshToken = localStorage.getItem('refresh_token')
-    const refreshToken = JSON.parse(storageRefreshToken)
-    const decodedRefreshToken =  jwt_decode(refreshToken)
-    if (decoded?.exp < currentTime.getTime() / 1000) {
-      if(decodedRefreshToken?.exp > currentTime.getTime() / 1000) {
-        const data = await UserService.refreshToken(refreshToken)
-        config.headers['token'] = `Bearer ${data?.access_token}`
-      }else {
-        dispatch(resetUser())
+  UserService.axiosJWT.interceptors.request.use(
+    async (config) => {
+      const currentTime = new Date()
+      const { decoded } = handleDecoded()
+      let storageRefreshToken = localStorage.getItem('refresh_token')
+      if (!storageRefreshToken) {
+        return config
       }
-    }
-    return config;
-  }, (err) => {
-    return Promise.reject(err)
-  })
+      let refreshToken
+      try {
+        refreshToken = JSON.parse(storageRefreshToken)
+      } catch {
+        return config
+      }
+      if (!refreshToken) return config
+      let decodedRefreshToken
+      try {
+        decodedRefreshToken = jwt_decode(refreshToken)
+      } catch {
+        return config
+      }
+      if (decoded?.exp < currentTime.getTime() / 1000) {
+        if (decodedRefreshToken?.exp > currentTime.getTime() / 1000) {
+          const data = await UserService.refreshToken(refreshToken)
+          config.headers['token'] = `Bearer ${data?.access_token}`
+        } else {
+          dispatch(resetUser())
+        }
+      }
+      return config
+    },
+    (err) => Promise.reject(err)
+  )
 
   const handleGetDetailsUser = async (id, token) => {
     let storageRefreshToken = localStorage.getItem('refresh_token')

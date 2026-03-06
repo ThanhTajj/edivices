@@ -12,8 +12,6 @@ import jwtDecode from 'jwt-decode'
 import { useDispatch } from 'react-redux'
 import { updateUser } from '../../redux/slides/userSlide'
 import { loadCart } from '../../redux/slides/orderSlide'
-import { useLocation } from 'react-router-dom'
-import { addOrderProduct } from '../../redux/slides/orderSlide'
 
 const SignInPage = () => {
   const [email, setEmail] = useState('')
@@ -21,7 +19,6 @@ const SignInPage = () => {
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const location = useLocation()
 
   const mutation = useMutationHooks(
     data => UserService.loginUser(data)
@@ -29,29 +26,41 @@ const SignInPage = () => {
 
   const {data, isPending, isSuccess} = mutation
 
-  useEffect(() => {
-    if (isSuccess) {
-      localStorage.setItem('access_token', JSON.stringify(data?.access_token))
-      if(data?.access_token) {
-        const decoded = jwtDecode(data?.access_token)
-        if (decoded?.id) {
-          handleGetDetailsUser(decoded?.id, data?.access_token)
-        }
-      }
+  const decodeTokenSafe = (token) => {
+    try {
+      if (!token || token === 'undefined' || token === 'null') return null
+      return jwtDecode(token)
+    } catch (error) {
+      console.log('Token decode error:', error)
+      return null
     }
-  }, [isSuccess])
+  }
+
+  useEffect(() => {
+    if (!data) return
+
+    if (data?.status !== 'OK') return
+    if (!data?.access_token) return
+
+    localStorage.setItem('access_token', data.access_token)
+
+    const decoded = decodeTokenSafe(data.access_token)
+
+    if (decoded?.id) {
+      handleGetDetailsUser(decoded.id, data.access_token)
+    }
+  }, [data])
 
   const handleGetDetailsUser = async (id, token) => {
-    const res = await UserService.getDetailsUser(id, token)
-    dispatch(updateUser({ ...res?.data, access_token: token }))
-    dispatch(loadCart({ userId: id }))
-    if (location.state?.redirectAddToCart) {
-      dispatch(addOrderProduct({
-        orderItem: location.state.redirectAddToCart,
-        userId: id
-      }))
+    if (!token) return
+    try {
+      const res = await UserService.getDetailsUser(id, token)
+      dispatch(updateUser({ ...res?.data, access_token: token }))
+      dispatch(loadCart({ userId: id }))
+      navigate('/')
+    } catch (error) {
+      console.log('Get details error:', error)
     }
-    navigate('/', { replace: true })
   }
 
   const handleNavigateSignUp = () => {
