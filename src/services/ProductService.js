@@ -76,9 +76,22 @@ export const deleteManyProduct = async (data, access_token,) => {
     return res.data
 }
 
-export const getAllTypeProduct = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all-type`)
-    return res.data
+export const getAllTypeProduct = async (sortType) => {
+  const res = await axios.get(
+    `${process.env.REACT_APP_API_URL}/product/get-all-type`,
+    {
+      params: { sort: sortType }
+    }
+  )
+  return res.data
+}
+
+export const updateProductType = async (id, data) => {
+  const res = await axios.put(
+    `${process.env.REACT_APP_API_URL}/product/update-type/${id}`,
+    data
+  )
+  return res.data
 }
 
 export const searchProduct = async (keyword) => {
@@ -95,7 +108,7 @@ export const searchProduct = async (keyword) => {
   return res.data
 }
 
-export const deleteReview = async (id, token) => {
+export const deleteReview = async (id, reviewId, token) => {
   const res = await axios.delete(
     `${process.env.REACT_APP_API_URL}/product/review/${id}`,
     {
@@ -103,6 +116,31 @@ export const deleteReview = async (id, token) => {
         token:`Bearer ${token}`
       }
     }
+  )
+  return res.data
+}
+
+export const createProductType = async (data) => {
+  const res = await axios.post(`${process.env.REACT_APP_API_URL}/product/create-type`, data)
+  return res.data
+}
+
+export const deleteProductType = async (id) => {
+  const res = await axios.delete(`${process.env.REACT_APP_API_URL}/product/delete-type/${id}`)
+  return res.data
+}
+
+export const updateTypeSortSetting = async (value) => {
+  const res = await axios.put(
+    `${process.env.REACT_APP_API_URL}/product/type-sort-setting`,
+    { value }
+  )
+  return res.data
+}
+
+export const getTypeSortSetting = async () => {
+  const res = await axios.get(
+    `${process.env.REACT_APP_API_URL}/product/type-sort-setting`
   )
   return res.data
 }

@@ -42,15 +42,22 @@ const ProductsPage = () => {
   const allProducts = products?.data || []
 
   let filteredProducts = allProducts.filter(item => {
-    if (activeTab !== 'All' && item.type !== activeTab) return false;
+    if (activeTab !== 'All' && item.type?.type !== activeTab) return false;
     if (searchTerm && !item.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
     return true;
   })
 
+  const getFinalPrice = (product) => {
+    if (product.discount > 0) {
+      return Math.round(product.price * (1 - product.discount / 100))
+    }
+    return product.price
+  }
+
   if (sortOrder === 'Highest Price') {
-    filteredProducts.sort((a, b) => b.price - a.price)
+    filteredProducts.sort((a, b) => getFinalPrice(b) - getFinalPrice(a))
   } else if (sortOrder === 'Lowest Price') {
-    filteredProducts.sort((a, b) => a.price - b.price)
+    filteredProducts.sort((a, b) => getFinalPrice(a) - getFinalPrice(b))
   }
 
   return (
@@ -66,7 +73,7 @@ const ProductsPage = () => {
             <SearchInputWrapper>
               <Input
                 size="large"
-                placeholder="Search products..."
+                placeholder="Tìm kiếm..."
                 prefix={<SearchOutlined style={{ color: '#94a3b8' }} />}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -89,15 +96,18 @@ const ProductsPage = () => {
           </ControlsWrapper>
 
           <FilterPills>
-            {typeProducts.map(type => (
-              <Pill
-                key={type}
-                active={activeTab === type}
-                onClick={() => setActiveTab(type)}
-              >
-                {type}
-              </Pill>
-            ))}
+            {typeProducts.map(type => {
+              const typeName = typeof type === 'string' ? type : type?.type
+              return (
+                <Pill
+                  key={typeName}
+                  active={activeTab === typeName}
+                  onClick={() => setActiveTab(typeName)}
+                >
+                  {typeName === 'All' ? 'Tất cả' : typeName}
+                </Pill>
+              )
+            })}
           </FilterPills>
 
           <ProductGrid>
@@ -110,7 +120,7 @@ const ProductsPage = () => {
                 name={product.name}
                 price={product.price}
                 rating={product.rating}
-                type={product.type}
+                type={product.type?.type}
                 selled={product.selled}
                 discount={product.discount}
                 id={product._id}

@@ -20,6 +20,7 @@ const TypeProductPage = () => {
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState(false)
     const [panigate, setPanigate] = useState({
+        page: 0,
         limit: 10,
         total: 0,
     })
@@ -34,7 +35,7 @@ const TypeProductPage = () => {
     const fetchAllTypeProduct = async () => {
         const res = await ProductService.getAllTypeProduct()
         if (res?.status === 'OK') {
-            setTypeProducts(res?.data)
+            setTypeProducts(res?.data.map(item => item.type))
         }
     }
 
@@ -56,7 +57,7 @@ const TypeProductPage = () => {
             } else if (type) {
                 res = await ProductService.getProductType(
                     type,
-                    0,
+                    panigate.page || 0,
                     panigate.limit
                 )
             }
@@ -75,7 +76,7 @@ const TypeProductPage = () => {
 
     useEffect(() => {
         fetchProducts()
-    }, [keyword, type, panigate.limit])
+    }, [keyword, type, panigate.limit, panigate.page])
 
     const onChange = (current, pageSize) => {
         setPanigate(prev => ({
@@ -98,6 +99,7 @@ const TypeProductPage = () => {
 
     useEffect(() => {
         setPanigate({
+            page: 0,
             limit: 10,
             total: 0
         })
@@ -118,11 +120,13 @@ const TypeProductPage = () => {
                 <div style={{ background: '#f4f6f8', width: '100%', padding: '20px 0' }}>
                     <div style={{ width: '1310px', margin: '0 auto', backgroundColor: '#f4f6f8' }}>
                         <WrapperTypeProduct>
-                            {typeProducts.map((item) => {
-                                return (
-                                    <TypeProduct style={{ backgroundColor: 'none', width: '100%' }} name={item} key={item} />
-                                )
-                            })}
+                            {typeProducts.map((item) => (
+                                <TypeProduct
+                                    style={{ backgroundColor: 'none', width: '100%' }}
+                                    name={item}
+                                    key={item}
+                                />
+                            ))}
                         </WrapperTypeProduct>
                     </div>
                 </div>

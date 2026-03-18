@@ -9,7 +9,7 @@ import Loading from '../LoadingComponent/Loading'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { addOrderProduct, clearSuccess, resetOrder } from '../../redux/slides/orderSlide'
+import { addOrderProduct, resetOrder } from '../../redux/slides/orderSlide'
 import { convertPrice } from '../../utils'
 import { useEffect } from 'react'
 import * as message from '../Message/Message'
@@ -30,12 +30,10 @@ const ProductDetailsComponent = ({ idProduct }) => {
     const location = useLocation()
     const dispatch = useDispatch()
 
-    const fetchGetDetailsProduct = async (context) => {
-        const id = context?.queryKey && context?.queryKey[1]
-        if (id) {
-            const res = await ProductService.getDetailsProduct(id)
-            return res.data
-        }
+    const fetchGetDetailsProduct = async ({ queryKey }) => {
+        const [, id] = queryKey
+        const res = await ProductService.getDetailsProduct(id)
+        return res.data
     }
     const { isLoading, data: productDetails, refetch } = useQuery(['product-details', idProduct], fetchGetDetailsProduct, { enabled: !!idProduct })
 
@@ -50,20 +48,15 @@ const ProductDetailsComponent = ({ idProduct }) => {
     }, [productDetails])
 
     useEffect(() => {
-        const orderRedux = order?.orderItems?.find((item) => item.product === productDetails?._id)
-        if ((orderRedux?.amount + numProduct) <= orderRedux?.countInstock || (!orderRedux && productDetails?.countInStock > 0)) {
+        const orderRedux = order?.orderItems?.find(
+            (item) => item.product === productDetails?._id
+        )
+        if ((orderRedux?.amount + numProduct) <= orderRedux?.countInStock || (!orderRedux && productDetails?.countInStock > 0)) {
             setErrorLimitOrder(false)
-        } else if (productDetails?.countInStock === 0) {
+        } else {
             setErrorLimitOrder(true)
         }
-    }, [numProduct])
-
-    useEffect(() => {
-        if(order.isSucessOrder){
-            message.success('Đã thêm vào giỏ hàng')
-            dispatch(clearSuccess())
-        }
-    }, [order.isSucessOrder])
+    }, [numProduct, order, productDetails])
 
     const handleChangeCount = (type, limited) => {
         if (type === 'increase') {
@@ -102,7 +95,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
 
     const handleDeleteReview = (reviewId)=>{
         mutationDelete.mutate(
-        { id:idProduct, token:user.access_token },
+        { id:idProduct, reviewId, token:user.access_token },
         {
             onSuccess: ()=>{
             message.success("Đã xoá đánh giá")
@@ -162,7 +155,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
             navigate('/sign-in', { state: location?.pathname })
         } else {
             const orderRedux = order?.orderItems?.find((item) => item.product === productDetails?._id)
-            if ((orderRedux?.amount + numProduct) <= orderRedux?.countInstock || (!orderRedux && productDetails?.countInStock > 0)) {
+            if ((orderRedux?.amount + numProduct) <= orderRedux?.countInStock || (!orderRedux && productDetails?.countInStock > 0)) {
                 dispatch(addOrderProduct({
                     orderItem: {
                         name: productDetails?.name,
@@ -171,9 +164,10 @@ const ProductDetailsComponent = ({ idProduct }) => {
                         price: productDetails?.price,
                         product: productDetails?._id,
                         discount: productDetails?.discount,
-                        countInstock: productDetails?.countInStock
+                        countInStock: productDetails?.countInStock
                     }, userId: user.id
                 }))
+                message.success('Đã thêm vào giỏ hàng')
             } else {
                 setErrorLimitOrder(true)
             }
@@ -201,7 +195,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
     }, [productDetails, user.id])
 
     const fetchRelatedProducts = async () => {
-        const res = await ProductService.getProductType(productDetails?.type)
+        const res = await ProductService.getProductType(productDetails?.type?._id)
         return res.data
     }
 
@@ -229,12 +223,16 @@ const ProductDetailsComponent = ({ idProduct }) => {
 
         const others = otherProducts
             .filter(p =>
-                p.type !== productDetails?.type &&
+                p.type?._id !== productDetails?.type?._id &&
                 p._id !== idProduct
             )
 
         return [...related, ...others].slice(0, 8)
     }, [relatedProducts, otherProducts, productDetails, idProduct])
+
+    const specs = productDetails?.description
+        ? productDetails.description.split('\n')
+        : []
 
     return (
         <Loading isLoading={isLoading}>
@@ -304,7 +302,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
                             </button>
                         </WrapperQualityProduct>
                     </div>
-                    <div style={{ display: 'flex', aliggItems: 'center', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <div>
                             <ButtonComponent
                                 size={40}
@@ -324,7 +322,43 @@ const ProductDetailsComponent = ({ idProduct }) => {
                     </div>
                 </Col>
                 <Row gutter={16} style={{ marginTop: 20 }}>
-                    <Col span={16}>
+                    <Col span={15}>
+                        <div style={{ fontWeight: 700, marginBottom: 12 }}>
+                            <div>Thông tin sản phẩm</div>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 10 }}>
+                                <tbody>
+                                    {specs?.map((item, index) => {
+                                        const parts = item.split(':')
+                                        const key = parts[0]
+                                        const value = parts.slice(1).join(':')
+                                        if(!value?.trim()) return null
+                                        return (
+                                            <tr key={index}>
+                                                <td
+                                                    style={{
+                                                        width: '40%',
+                                                        padding: '8px',
+                                                        background: '#f5f5f5',
+                                                        fontWeight: 500,
+                                                        border: '1px solid #eee'
+                                                    }}
+                                                >
+                                                    {key}
+                                                </td>
+                                                <td
+                                                    style={{
+                                                        padding: '8px',
+                                                        border: '1px solid #eee'
+                                                    }}
+                                                >
+                                                    {value}
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
                         <div style={{ fontWeight: 700, marginBottom: 12 }}>
                             Danh sách đánh giá ({productDetails?.ratedUsers?.length})
                         </div>
@@ -371,7 +405,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
                             )
                         })}
                     </Col>
-                    <Col span={8}>
+                    <Col span={9}>
                         <div style={{ fontWeight: 700, marginBottom: 12 }}>
                             Sản phẩm khác
                         </div>

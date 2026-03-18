@@ -29,18 +29,18 @@ export function getItem(label, key, icon, children, type) {
 
 export const renderOptions = (arr) => {
     let results = []
-    if(arr) {
-        results = arr?.map((opt) => {
-            return {
-                value: opt,
-                label: opt
-            }
-        })
+    if (arr) {
+        results = arr.map((opt) => ({
+            value: opt.type,
+            label: opt.type
+        }))
     }
+
     results.push({
-        label: 'Thêm type',
+        label: 'Thêm loại sản phẩm',
         value: 'add_type'
     })
+
     return results
 }
 

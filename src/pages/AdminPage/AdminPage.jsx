@@ -12,6 +12,7 @@ import * as UserService from '../../services/UserService'
 import { useSelector } from 'react-redux';
 import { useQueries } from '@tanstack/react-query';
 import { Navigate } from 'react-router-dom';
+import AdminProductType from '../../components/AdminProductType/AdminProductType';
 
 const AdminPage = () => {
   const user = useSelector((state) => state?.user)
@@ -19,6 +20,7 @@ const AdminPage = () => {
   const items = [
     getItem('Người dùng', 'users', <UserOutlined />),
     getItem('Sản phẩm', 'products', <AppstoreOutlined />),
+    getItem('Loại sản phẩm', 'product-type', <AppstoreOutlined />),
     getItem('Đơn hàng', 'orders', <ShoppingCartOutlined />),
   ];
 
@@ -53,17 +55,17 @@ const AdminPage = () => {
   const renderPage = (key) => {
     switch (key) {
       case 'users':
-        return (
-          <AdminUser />
-        )
+        return <AdminUser />
+
       case 'products':
-        return (
-          <AdminProduct />
-        )
+        return <AdminProduct />
+
+      case 'product-type':
+        return <AdminProductType />
+
       case 'orders':
-        return (
-          <OrderAdmin />
-        )
+        return <OrderAdmin />
+
       default:
         return <></>
     }

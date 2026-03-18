@@ -16,8 +16,20 @@ import DrawerComponent from '../DrawerComponent/DrawerComponent'
 import { useSelector } from 'react-redux'
 import ModalComponent from '../ModalComponent/ModalComponent'
 import ImportProductExcel from '../ImportExcelComponent/ImportExcelComponent'
+import { Input } from 'antd'
+const { TextArea } = Input
 
 const AdminProduct = () => {
+  const descriptionTemplate = `Loại card đồ họa:
+Dung lượng RAM:
+Ổ cứng:
+Kích thước màn hình:
+Công nghệ màn hình:
+Pin:
+Hệ điều hành:
+Độ phân giải màn hình:
+Loại CPU:
+Cổng giao tiếp:`
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rowSelected, setRowSelected] = useState('')
   const [isOpenDrawer, setIsOpenDrawer] = useState(false)
@@ -30,7 +42,7 @@ const AdminProduct = () => {
   const inittial = () => ({
     name: '',
     price: '',
-    description: '',
+    description: descriptionTemplate,
     rating: '',
     image: '',
     type: '',
@@ -43,6 +55,10 @@ const AdminProduct = () => {
   const [stateProductDetails, setStateProductDetails] = useState(inittial())
 
   const [form] = Form.useForm();
+
+  const mutationCreateType = useMutationHooks(
+    (data) => ProductService.createProductType(data)
+  )
 
   const mutation = useMutationHooks(
     (data) => {
@@ -122,7 +138,9 @@ const AdminProduct = () => {
         description: res?.data?.description,
         rating: res?.data?.rating,
         image: imageValue,
-        type: res?.data?.type,
+        type: typeof res?.data?.type === 'object'
+          ? res?.data?.type?.type
+          : res?.data?.type,
         brand: res?.data?.brand,
         countInStock: res?.data?.countInStock,
         discount: res?.data?.discount
@@ -181,6 +199,19 @@ const AdminProduct = () => {
     )
   }
 
+  const handleCreateType = () => {
+    mutationCreateType.mutate(
+      { type: newTypeName },
+      {
+        onSuccess: () => {
+          message.success("Thêm loại sản phẩm thành công")
+          setIsModalTypeOpen(false)
+          setNewTypeName('')
+          typeProduct.refetch()
+        }
+      }
+    )
+  }
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -240,7 +271,9 @@ const AdminProduct = () => {
       />
     ),
     onFilter: (value, record) =>
-      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+      String(record[dataIndex] ?? '')
+        .toLowerCase()
+        .includes(value.toLowerCase()),
     onFilterDropdownOpenChange: (visible) => {
       if (visible) {
         setTimeout(() => searchInput.current?.select(), 100);
@@ -250,13 +283,13 @@ const AdminProduct = () => {
 
   const columns = [
     {
-      title: 'Name',
+      title: 'Tên',
       dataIndex: 'name',
       sorter: (a, b) => a.name.length - b.name.length,
       ...getColumnSearchProps('name')
     },
     {
-      title: 'Price',
+      title: 'Giá',
       dataIndex: 'price',
       sorter: (a, b) => a.price - b.price,
       filters: [
@@ -277,7 +310,7 @@ const AdminProduct = () => {
       },
     },
     {
-      title: 'Rating',
+      title: 'Đánh giá',
       dataIndex: 'rating',
       sorter: (a, b) => a.rating - b.rating,
       filters: [
@@ -298,25 +331,26 @@ const AdminProduct = () => {
       },
     },
     {
-      title: 'In Stock',
+      title: 'Tồn kho',
       dataIndex: 'countInStock',
       sorter: (a, b) => a.countInStock - b.countInStock,
     },
     {
-      title: 'Type',
+      title: 'Loại',
       dataIndex: 'type',
+      render: (type) => String(type || '')
     },
     {
-      title: 'Brand',
+      title: 'Nhãn hiệu',
       dataIndex: 'brand',
     },
     {
-      title: 'Discount (%)',
+      title: 'Giảm giá (%)',
       dataIndex: 'discount',
       sorter: (a, b) => a.discount - b.discount,
     },
     {
-      title: 'Image',
+      title: 'Ảnh',
       dataIndex: 'image',
       render: (image) => (
         <img
@@ -332,22 +366,34 @@ const AdminProduct = () => {
       )
     },
     {
-      title: 'Description',
+      title: 'Mô tả',
       dataIndex: 'description',
       render: (text) => (
         <span>{text?.length > 50 ? text.slice(0, 50) + '...' : text}</span>
       )
     },
     {
-      title: 'Action',
+      title: 'Thao tác',
       dataIndex: 'action',
       render: renderAction
     },
   ];
+
   const dataTable = Array.isArray(products?.data)
     ? products.data.map((product) => ({
-        ...product,
         key: product._id,
+        name: product.name,
+        price: product.price,
+        rating: product.rating,
+        countInStock: product.countInStock,
+        brand: product.brand,
+        discount: product.discount,
+        description: product.description,
+        image: product.image,
+        type:
+          typeof product.type === 'object'
+            ? product.type.type
+            : product.type
       }))
     : []
 
@@ -397,7 +443,6 @@ const AdminProduct = () => {
     setIsModalOpenDelete(false)
   }
 
-
   const handleDeleteProduct = () => {
     mutationDeleted.mutate({ id: rowSelected, token: user?.access_token }, {
       onSettled: () => {
@@ -408,17 +453,7 @@ const AdminProduct = () => {
 
   const handleCancel = () => {
     setIsModalOpen(false);
-    setStateProduct({
-      name: '',
-      price: '',
-      description: '',
-      rating: '',
-      image: '',
-      type: '',
-      brand: '',
-      countInStock: '',
-      discount: '',
-    })
+    setStateProduct(inittial())
     form.resetFields()
   };
 
@@ -507,20 +542,27 @@ const AdminProduct = () => {
         onSuccess={() => queryProduct.refetch()}
       />
       <div style={{ marginTop: '10px' }}>
-        <Button style={{ height: '150px', width: '150px', borderRadius: '6px', borderStyle: 'dashed' }} onClick={() => setIsModalOpen(true)}><PlusOutlined style={{ fontSize: '60px' }} /></Button>
+        <Button
+          style={{ height: '150px', width: '150px', borderRadius: '6px', borderStyle: 'dashed' }}
+          onClick={() => {
+            setIsModalOpen(true)
+            setStateProduct(inittial())
+          }}
+        >
+          <PlusOutlined style={{ fontSize: '60px' }} />
+        </Button>
       </div>
       <div style={{ marginTop: '20px' }}>
         <TableComponent handleDelteMany={handleDelteManyProducts} columns={columns} isLoading={isLoadingProducts} data={dataTable} onRow={(record, rowIndex) => {
           return {
             onClick: event => {
-              setRowSelected(record._id)
+              setRowSelected(record.key)
             }
           };
         }} />
       </div>
       <ModalComponent forceRender title="Tạo sản phẩm" open={isModalOpen} onCancel={handleCancel} footer={null}>
         <Loading isLoading={isLoading}>
-
           <Form
             name="basic"
             labelCol={{ span: 6 }}
@@ -530,17 +572,17 @@ const AdminProduct = () => {
             form={form}
           >
             <Form.Item
-              label="Name"
+              label="Tên sản phẩm"
               name="name"
-              rules={[{ required: true, message: 'Please input your name!' }]}
+              rules={[{ required: true, message: 'Vui lòng nhập tên sản phẩm!' }]}
             >
               <InputComponent value={stateProduct['name']} onChange={handleOnchange} name="name" />
             </Form.Item>
 
             <Form.Item
-              label="Type"
+              label="Loại sản phẩm"
               name="type"
-              rules={[{ required: true, message: 'Please input your type!' }]}
+              rules={[{ required: true, message: 'Vui lòng chọn loại sản phẩm!' }]}
             >
               <Select
                 name="type"
@@ -551,52 +593,63 @@ const AdminProduct = () => {
             </Form.Item>
             {stateProduct.type === 'add_type' && (
               <Form.Item
-                label='New type'
+                label='Loại mới'
                 name="newType"
-                rules={[{ required: true, message: 'Please input your type!' }]}
+                rules={[{ required: true, message: 'Vui lòng nhập loại sản phẩm mới!' }]}
               >
                 <InputComponent value={stateProduct.newType} onChange={handleOnchange} name="newType" />
               </Form.Item>
             )}
             <Form.Item
-              label="Brand"
+              label="Nhãn hiệu"
               name="brand"
-              rules={[{ required: true, message: 'Please input your brand!' }]}
+              rules={[{ required: true, message: 'Vui lòng nhập nhãn hiệu!' }]}
             >
               <InputComponent value={stateProduct.brand} onChange={handleOnchange} name="brand" />
             </Form.Item>
             <Form.Item
-              label="Count inStock"
+              label="Số hàng tồn kho"
               name="countInStock"
-              rules={[{ required: true, message: 'Please input your count inStock!' }]}
+              rules={[{ required: true, message: 'Vui lòng nhập số lượng hàng tồn kho!' }]}
             >
               <InputComponent value={stateProduct.countInStock} onChange={handleOnchange} name="countInStock" />
             </Form.Item>
             <Form.Item
-              label="Price"
+              label="Giá"
               name="price"
-              rules={[{ required: true, message: 'Please input your count price!' }]}
+              rules={[{ required: true, message: 'Vui lòng nhập giá sản phẩm!' }]}
             >
               <InputComponent value={stateProduct.price} onChange={handleOnchange} name="price" />
             </Form.Item>
             <Form.Item
-              label="Description"
+              label="Mô tả"
               name="description"
-              rules={[{ required: false, message: 'Please input your count description!' }]}
+              rules={[{ required: true, message: 'Vui lòng nhập mô tả sản phẩm!' }]}
             >
-              <InputComponent value={stateProduct.description} onChange={handleOnchange} name="description" />
+              <TextArea
+                rows={6}
+                value={stateProduct.description}
+                onChange={handleOnchange}
+                name="description"
+                placeholder={`CPU:
+RAM:
+Ổ cứng:
+Màn hình:
+Độ phân giải:
+...`}
+              />
             </Form.Item>
             <Form.Item
-              label="Rating"
+              label="Đánh giá"
               name="rating"
-              rules={[{ required: true, message: 'Please input your count rating!' }]}
+              rules={[{ required: true, message: 'Vui lòng nhập số sao đánh giá!' }]}
             >
               <InputComponent value={stateProduct.rating} onChange={handleOnchange} name="rating" />
             </Form.Item>
             <Form.Item
-              label="Discount"
+              label="Giảm giá (%)"
               name="discount"
-              rules={[{ required: true, message: 'Please input your discount of product!' }]}
+              rules={[{ required: true, message: 'Vui lòng nhập phần trăm giảm giá!' }]}
             >
               <InputComponent value={stateProduct.discount} onChange={handleOnchange} name="discount" />
             </Form.Item>
@@ -615,7 +668,7 @@ const AdminProduct = () => {
               />
             </Form.Item>
             <Form.Item
-              label="Image"
+              label="Ảnh"
               name="image"
               rules={[
                 {
@@ -653,7 +706,7 @@ const AdminProduct = () => {
             )}
             <Form.Item wrapperCol={{ offset: 20, span: 16 }}>
               <Button type="primary" htmlType="submit">
-                Submit
+                Lưu
               </Button>
             </Form.Item>
           </Form>
@@ -661,7 +714,6 @@ const AdminProduct = () => {
       </ModalComponent>
       <DrawerComponent title='Chi tiết sản phẩm' isOpen={isOpenDrawer} onClose={() => setIsOpenDrawer(false)} width="90%">
         <Loading isLoading={isLoadingUpdate || isLoadingUpdated}>
-
           <Form
             name="basic"
             labelCol={{ span: 2 }}
@@ -671,17 +723,17 @@ const AdminProduct = () => {
             form={form}
           >
             <Form.Item
-              label="Name"
+              label="Tên sản phẩm"
               name="name"
-              rules={[{ required: true, message: 'Please input your name!' }]}
+              rules={[{ required: true, message: 'Vui lòng nhập tên sản phẩm!' }]}
             >
               <InputComponent value={stateProductDetails['name']} onChange={handleOnchangeDetails} name="name" />
             </Form.Item>
 
             <Form.Item
-              label="Type"
+              label="Loại"
               name="type"
-              rules={[{ required: true, message: 'Please input your type!' }]}
+              rules={[{ required: true, message: 'Vui lòng chọn loại sản phẩm!' }]}
             >
               <Select
                 name="type"
@@ -692,52 +744,57 @@ const AdminProduct = () => {
             </Form.Item>
             {stateProductDetails.type === 'add_type' && (
               <Form.Item
-                label='New type'
+                label='Loại mới'
                 name="newType"
-                rules={[{ required: true, message: 'Please input your type!' }]}
+                rules={[{ required: true, message: 'Vui lòng nhập loại sản phẩm mới!' }]}
               >
                 <InputComponent value={stateProductDetails.newType} onChange={handleOnchangeDetails} name="newType" />
               </Form.Item>
             )}
             <Form.Item
-              label="Brand"
+              label="Nhãn hiệu"
               name="brand"
-              rules={[{ required: true, message: 'Please input your brand!' }]}
+              rules={[{ required: true, message: 'Vui lòng nhập nhãn hiệu!' }]}
             >
               <InputComponent value={stateProductDetails.brand} onChange={handleOnchangeDetails} name="brand" />
             </Form.Item>
             <Form.Item
-              label="Count inStock"
+              label="Số hàng tồn kho"
               name="countInStock"
-              rules={[{ required: true, message: 'Please input your count inStock!' }]}
+              rules={[{ required: true, message: 'Vui lòng nhập số hàng tồn kho!' }]}
             >
               <InputComponent value={stateProductDetails.countInStock} onChange={handleOnchangeDetails} name="countInStock" />
             </Form.Item>
             <Form.Item
-              label="Price"
+              label="Giá"
               name="price"
-              rules={[{ required: true, message: 'Please input your count price!' }]}
+              rules={[{ required: true, message: 'Vui lòng nhập giá sản phẩm!' }]}
             >
               <InputComponent value={stateProductDetails.price} onChange={handleOnchangeDetails} name="price" />
             </Form.Item>
             <Form.Item
-              label="Description"
+              label="Mô tả"
               name="description"
-              rules={[{ required: false, message: 'Please input your count description!' }]}
+              rules={[{ required: true, message: 'Vui lòng nhập mô tả sản phẩm!' }]}
             >
-              <InputComponent value={stateProductDetails.description} onChange={handleOnchangeDetails} name="description" />
+              <TextArea
+                rows={6}
+                value={stateProductDetails.description}
+                onChange={handleOnchangeDetails}
+                name="description"
+              />
             </Form.Item>
             <Form.Item
-              label="Rating"
+              label="Đánh giá"
               name="rating"
-              rules={[{ required: true, message: 'Please input your count rating!' }]}
+              rules={[{ required: true, message: 'Vui lòng nhập số sao đánh giá!' }]}
             >
               <InputComponent value={stateProductDetails.rating} onChange={handleOnchangeDetails} name="rating" />
             </Form.Item>
             <Form.Item
-              label="Discount"
+              label="Giảm giá (%)"
               name="discount"
-              rules={[{ required: true, message: 'Please input your discount of product!' }]}
+              rules={[{ required: true, message: 'Vui lòng nhập phần trăm giảm giá!' }]}
             >
               <InputComponent value={stateProductDetails.discount} onChange={handleOnchangeDetails} name="discount" />
             </Form.Item>
@@ -756,7 +813,7 @@ const AdminProduct = () => {
               />
             </Form.Item>
             <Form.Item
-              label="Image"
+              label="Ảnh"
               name="image"
               rules={[
                 {
@@ -794,7 +851,7 @@ const AdminProduct = () => {
             )}
             <Form.Item wrapperCol={{ offset: 20, span: 16 }}>
               <Button type="primary" htmlType="submit">
-                Apply
+                Xác nhận
               </Button>
             </Form.Item>
           </Form>

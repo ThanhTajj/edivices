@@ -25,7 +25,6 @@ const initialState = {
   paidAt: '',
   isDelivered: false,
   deliveredAt: '',
-  isSucessOrder: false,
 }
 
 export const orderSlide = createSlice({
@@ -46,7 +45,7 @@ export const orderSlide = createSlice({
       )
 
       if (itemOrder) {
-        if (itemOrder.amount < itemOrder.countInstock) {
+        if (itemOrder.amount < itemOrder.countInStock) {
           itemOrder.amount += orderItem.amount
         }
       } else {
@@ -54,7 +53,6 @@ export const orderSlide = createSlice({
       }
 
       saveOrderToLocalStorage(userId, state.orderItems)
-      state.isSucessOrder = true
     },
 
     increaseAmount: (state, action) => {
@@ -64,7 +62,7 @@ export const orderSlide = createSlice({
         (item) => item.product === idProduct
       )
 
-      if (item && item.amount < item.countInstock) {
+      if (item && item.amount < item.countInStock) {
         item.amount++
       }
 
@@ -134,11 +132,6 @@ export const orderSlide = createSlice({
       state.paidAt = ''
       state.isDelivered = false
       state.deliveredAt = ''
-      state.isSucessOrder = false
-    },
-
-    clearSuccess: (state) => {
-      state.isSucessOrder = false
     },
   },
 })
@@ -152,7 +145,6 @@ export const {
   selectedOrder,
   resetOrder,
   loadCart,
-  clearSuccess,
 } = orderSlide.actions
 
 export default orderSlide.reducer

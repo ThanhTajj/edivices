@@ -38,7 +38,7 @@ export const WrapperHero = styled.div`
     background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);
     border-radius: 32px;
     margin-bottom: 60px;
-    margin-top: 40px;
+    /* margin-top: 40px; */
 `
 
 export const HeroContent = styled.div`

@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import { convertPrice } from '../../utils'
 import { useDispatch, useSelector } from 'react-redux'
 import { addOrderProduct } from '../../redux/slides/orderSlide'
+import { message } from 'antd'
 
 const CardComponent = (props) => {
     const { countInStock, description, image, name, price, rating, type, discount, selled, id } = props
@@ -19,6 +20,8 @@ const CardComponent = (props) => {
         navigate(`/product-details/${id}`)
     }
 
+    const finalPrice = discount > 0 ? price - (price * discount) / 100 : price;
+    
     const handleAddToCart = () => {
         if (!user?.id) {
             navigate('/sign-in', {
@@ -29,7 +32,7 @@ const CardComponent = (props) => {
                         image,
                         price: finalPrice,
                         amount: 1,
-                        countInstock: countInStock
+                        countInStock: countInStock
                     }
                 }
             })
@@ -43,13 +46,12 @@ const CardComponent = (props) => {
                 image,
                 price: finalPrice,
                 amount: 1,
-                countInstock: countInStock
+                countInStock: countInStock
             },
             userId: user.id
         }))
+        message.success('Đã thêm vào giỏ hàng')
     }
-
-    const finalPrice = discount > 0 ? price - (price * discount) / 100 : price;
 
     return (
         <WrapperCardStyle
@@ -58,7 +60,7 @@ const CardComponent = (props) => {
             onClick={() => handleDetailsProduct(id)}
         >
             {discount > 0 && <BadgeTopLeft>-{discount}%</BadgeTopLeft>}
-            <BadgeTopRight>Featured</BadgeTopRight>
+            {/* <BadgeTopRight>Featured</BadgeTopRight> */}
 
             <ProductCategory>{type}</ProductCategory>
             <StyleNameProduct>{name}</StyleNameProduct>

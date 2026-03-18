@@ -24,7 +24,6 @@ import {
 const HomePage = () => {
   const [loading, setLoading] = useState(false)
   const [limit, setLimit] = useState(200)
-  const [typeProducts, setTypeProducts] = useState([])
   const navigate = useNavigate()
   const fetchProductAll = async (context) => {
     const limit = context?.queryKey && context?.queryKey[1]
@@ -36,26 +35,33 @@ const HomePage = () => {
   const fetchAllTypeProduct = async () => {
     const res = await ProductService.getAllTypeProduct()
     if (res?.status === 'OK') {
-      setTypeProducts(res?.data)
+      setTypeProducts(res?.data.map((item) => item.type))
     }
   }
 
   const { isLoading, data: products } = useQuery(['products', limit], fetchProductAll, { retry: 3, retryDelay: 1000, keepPreviousData: true })
 
-  useEffect(() => {
-    fetchAllTypeProduct()
-  }, [])
+  const { data: sortData } = useQuery({
+    queryKey: ['type-sort-setting'],
+    queryFn: ProductService.getTypeSortSetting
+  })
+
+  const { data: typeData } = useQuery({
+    queryKey: ['product-types', sortData?.value],
+    queryFn: () =>
+      ProductService.getAllTypeProduct(sortData?.value)
+  })
+
+  const typeProducts = typeData?.data?.map(item => item.type) || []
 
   return (
     <Loading isLoading={isLoading || loading}>
       <div style={{ background: '#fff', width: '100%', padding: '20px 0' }}>
         <div style={{ width: '1310px', margin: '0 auto', backgroundColor: '#fff' }}>
           <WrapperTypeProduct>
-            {typeProducts.map((item) => {
-              return (
-                <TypeProduct style={{ backgroundColor: 'none', width: '100%' }} name={item} key={item} />
-              )
-            })}
+            {typeProducts.map((item) => (
+              <TypeProduct name={item} key={item} />
+            ))}
           </WrapperTypeProduct>
         </div>
       </div>
@@ -124,15 +130,16 @@ const HomePage = () => {
             </FeatureItem>
           </WrapperFeatures>
           <div id="featured-products" style={{ marginTop: '40px' }}>
-            {typeProducts.map((item) => {
-              return (
-                <ProductSection
-                  key={item}
-                  title={item}
-                  products={products?.data?.filter(product => product.type === item)}
-                />
-              )
-            })}
+            {typeProducts.map((item) => (
+              <ProductSection
+                key={item}
+                title={item}
+                products={products?.data?.filter(
+                  (product) =>
+                    (product.type?.type || product.type) === item
+                ) || []}
+              />
+            ))}
           </div>
         </div>
       </div>

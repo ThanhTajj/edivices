@@ -26,7 +26,7 @@ const getIconForType = (type) => {
     return <AppstoreOutlined />
 }
 
-const ProductSection = ({ title, subtitle = "Handpicked products you'll love", products }) => {
+const ProductSection = ({ title, subtitle = "", products }) => {
     const navigate = useNavigate()
     const [visibleCount, setVisibleCount] = useState(8)
 
@@ -64,7 +64,7 @@ const ProductSection = ({ title, subtitle = "Handpicked products you'll love", p
                             name={product.name}
                             price={product.price}
                             rating={product.rating}
-                            type={product.type}
+                            type={product.type?.type}
                             selled={product.selled}
                             discount={product.discount}
                             id={product._id}

@@ -236,8 +236,8 @@ const OrderPage = () => {
             <EmptyCartIcon>
               <ShoppingOutlined />
             </EmptyCartIcon>
-            <EmptyCartTitle>Your cart is empty</EmptyCartTitle>
-            <EmptyCartSubtitle>Looks like you haven't added anything yet.</EmptyCartSubtitle>
+            <EmptyCartTitle>Giỏ hàng trống</EmptyCartTitle>
+            <EmptyCartSubtitle>Có vẻ bạn chưa thêm gì vào giỏ hàng.</EmptyCartSubtitle>
             <ButtonComponent
               onClick={() => navigate('/products')}
               styleButton={{
@@ -247,7 +247,7 @@ const OrderPage = () => {
                 border: 'none',
                 borderRadius: '24px'
               }}
-              textButton={'Continue Shopping'}
+              textButton={'Tiếp tục mua sắm'}
               styleTextButton={{ color: '#fff', fontSize: '15px', fontWeight: '600' }}
             />
           </EmptyCartWrapper>
@@ -305,8 +305,8 @@ const OrderPage = () => {
                           <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('decrease', order?.product, order?.amount === 1)}>
                             <MinusOutlined style={{ color: '#000', fontSize: '10px' }} />
                           </button>
-                          <WrapperInputNumber defaultValue={order?.amount} value={order?.amount} size="small" min={1} max={order?.countInstock} />
-                          <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('increase', order?.product, order?.amount === order.countInstock, order?.amount === 1)}>
+                          <WrapperInputNumber defaultValue={order?.amount} value={order?.amount} size="small" min={1} max={order?.countInStock} />
+                          <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('increase', order?.product, order?.amount === order.countInStock, order?.amount === 1)}>
                             <PlusOutlined style={{ color: '#000', fontSize: '10px' }} />
                           </button>
                         </WrapperCountOrder>

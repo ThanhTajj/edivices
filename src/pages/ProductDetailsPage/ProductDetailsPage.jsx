@@ -3,23 +3,24 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Breadcrumb } from 'antd'
 import ProductDetailsComponent from '../../components/ProductDetailsComponent/ProductDetailsComponent'
 import { WrapperTypeProduct } from './style'
-import { useEffect } from 'react'
 import TypeProduct from '../../components/TypeProduct/TypeProduct'
 import * as ProductService from '../../services/ProductService'
+import { useQuery } from '@tanstack/react-query'
 
 const ProductDetailsPage = () => {
-  const [typeProducts, setTypeProducts] = useState([])
+  const { data: sortData } = useQuery({
+    queryKey: ['type-sort-setting'],
+    queryFn: ProductService.getTypeSortSetting
+  })
 
-  const fetchAllTypeProduct = async () => {
-    const res = await ProductService.getAllTypeProduct()
-    if (res?.status === 'OK') {
-      setTypeProducts(res?.data)
-    }
-  }
+  const { data: typeData } = useQuery({
+    queryKey: ['product-types', sortData?.value],
+    queryFn: () =>
+      ProductService.getAllTypeProduct(sortData?.value),
+    enabled: !!sortData?.value
+  })
 
-  useEffect(() => {
-    fetchAllTypeProduct()
-  }, [])
+  const typeProducts = typeData?.data?.map(item => item.type) || []
 
   const { id } = useParams()
   const navigate = useNavigate()
