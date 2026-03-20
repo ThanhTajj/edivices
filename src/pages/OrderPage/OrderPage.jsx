@@ -176,13 +176,21 @@ const OrderPage = () => {
   }
   const handleUpdateInforUser = () => {
     const { name, address, city, phone } = stateUserDetails
+    const phoneRegex = /^(0|\+84)[3|5|7|8|9][0-9]{8}$/
+    
     if (name && address && city && phone) {
-      mutationUpdate.mutate({ id: user?.id, token: user?.access_token, ...stateUserDetails }, {
-        onSuccess: () => {
-          dispatch(updateUser({ name, address, city, phone }))
-          setIsOpenModalUpdateInfo(false)
-        }
-      })
+      if (!phoneRegex.test(phone)) {
+        message.error('Số điện thoại không hợp lệ!')
+      } else {
+        mutationUpdate.mutate({ id: user?.id, token: user?.access_token, ...stateUserDetails }, {
+          onSuccess: () => {
+            dispatch(updateUser({ name, address, city, phone }))
+            setIsOpenModalUpdateInfo(false)
+          }
+        })
+      }
+    } else {
+      message.error('Vui lòng nhập đầy đủ thông tin!')
     }
   }
 

@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { getItem } from '../../utils';
 import { UserOutlined, AppstoreOutlined, ShoppingCartOutlined } from '@ant-design/icons'
 import HeaderComponent from '../../components/HeaderCompoent/HeaderComponent';
+import AdminHeader from '../../components/AdminHeader/AdminHeader';
 import AdminUser from '../../components/AdminUser/AdminUser';
 import AdminProduct from '../../components/AdminProduct/AdminProduct';
 import OrderAdmin from '../../components/OrderAdmin/OrderAmin';
@@ -24,7 +25,7 @@ const AdminPage = () => {
     getItem('Đơn hàng', 'orders', <ShoppingCartOutlined />),
   ];
 
-  const [keySelected, setKeySelected] = useState('');
+  const [keySelected, setKeySelected] = useState('users');
   const getAllOrder = async () => {
     const res = await OrderService.getAllOrder(user?.access_token)
     return {data: res?.data, key: 'orders'}
@@ -77,7 +78,7 @@ const AdminPage = () => {
 
   return (
     <>
-      <HeaderComponent isHiddenSearch isHiddenCart />
+      <AdminHeader />
       <div style={{ display: 'flex',overflowX: 'hidden', minHeight: '100vh' }}>
         <Menu
           mode="inline"
@@ -88,6 +89,7 @@ const AdminPage = () => {
           }}
           items={items}
           onClick={handleOnCLick}
+          defaultSelectedKeys={['users']}
         />
         <div style={{ flex: 1, padding: '15px 0 15px 15px' }}>
           {renderPage(keySelected)}

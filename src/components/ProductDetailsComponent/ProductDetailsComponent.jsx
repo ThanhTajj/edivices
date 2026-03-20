@@ -4,6 +4,7 @@ import { WrapperStyleNameProduct, WrapperStyleTextSell, WrapperPriceProduct, Wra
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons'
 import ButtonComponent from '../ButtonComponent/ButtonComponent'
 import * as ProductService from '../../services/ProductService'
+import * as OrderService from '../../services/OrderService'
 import { useQuery } from '@tanstack/react-query'
 import Loading from '../LoadingComponent/Loading'
 import { useState } from 'react'
@@ -79,29 +80,37 @@ const ProductDetailsComponent = ({ idProduct }) => {
     )
 
     const mutationDelete = useMutationHooks(
-        (data)=>{
-            const {id, token} = data
-            return ProductService.deleteReview(id, token)
+        (data) => {
+            const { id, reviewId, token } = data
+            return ProductService.deleteReview(id, reviewId, token)
         }
     )
-    
-    useEffect(() => {
-        if(productDetails?.ratedUsers && user?.id){
-            const mine = productDetails.ratedUsers.find(
-                r => r.user?._id === user.id
-            )
-        }
-    }, [productDetails])
 
-    const handleDeleteReview = (reviewId)=>{
+    // Query kiểm tra user đã mua sản phẩm này chưa (đơn hàng DELIVERED)
+    const { data: userOrders } = useQuery(
+        ['user-orders-check', user?.id],
+        () => OrderService.getOrderByUserId(user.id, user.access_token),
+        { enabled: !!user?.id && !!user?.access_token }
+    )
+
+    const hasBought = React.useMemo(() => {
+        if (!userOrders?.data || !idProduct) return false
+        return userOrders.data.some(
+            order =>
+                order.status === 'DELIVERED' &&
+                order.orderItems.some(item => item.product === idProduct || item.product?._id === idProduct)
+        )
+    }, [userOrders, idProduct])
+
+    const handleDeleteReview = (reviewId) => {
         mutationDelete.mutate(
-        { id:idProduct, reviewId, token:user.access_token },
-        {
-            onSuccess: ()=>{
-            message.success("Đã xoá đánh giá")
-            refetch()
+            { id: idProduct, reviewId, token: user.access_token },
+            {
+                onSuccess: () => {
+                    message.success("Đã xoá đánh giá")
+                    refetch()
+                }
             }
-        }
         )
     }
 
@@ -246,17 +255,40 @@ const ProductDetailsComponent = ({ idProduct }) => {
                         <span style={{ fontWeight: 600, marginRight: 6, fontSize: '18px' }}>
                             {productDetails?.rating?.toFixed(1)}
                         </span>
-                        <Rate allowHalf defaultValue={productDetails?.rating} value={myRating} onChange={handleRateChange} />
+                        <Rate
+                            allowHalf
+                            defaultValue={productDetails?.rating}
+                            value={myRating}
+                            onChange={hasBought ? handleRateChange : undefined}
+                            disabled={!hasBought}
+                            style={{ opacity: hasBought ? 1 : 0.5 }}
+                        />
                         <WrapperStyleTextSell> | Đã bán {productDetails?.selled || '0'}</WrapperStyleTextSell>
                         <WrapperStyleTextSell> | Tồn kho {productDetails?.countInStock}</WrapperStyleTextSell>
                     </div>
-                    <TextArea
-                        rows={3}
-                        placeholder="Viết nhận xét của bạn..."
-                        value={myComment}
-                        onChange={(e) => setMyComment(e.target.value)}
-                        style={{ marginTop: 10 }}
-                    />
+                    {hasBought ? (
+                        <TextArea
+                            rows={3}
+                            placeholder="Viết nhận xét của bạn..."
+                            value={myComment}
+                            onChange={(e) => setMyComment(e.target.value)}
+                            style={{ marginTop: 10 }}
+                        />
+                    ) : (
+                        <div style={{
+                            marginTop: 10,
+                            padding: '8px 12px',
+                            background: '#fff7e6',
+                            border: '1px solid #ffd591',
+                            borderRadius: 4,
+                            color: '#d46b08',
+                            fontSize: 13
+                        }}>
+                            {user?.id
+                                ? '🛒 Bạn cần mua và nhận hàng thành công để đánh giá sản phẩm này'
+                                : '🔑 Vui lòng đăng nhập và mua hàng để đánh giá'}
+                        </div>
+                    )}
                     <WrapperPriceProduct>
                         {productDetails?.discount > 0 ? (
                             <WrapperPriceTextProduct>

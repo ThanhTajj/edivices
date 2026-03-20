@@ -74,6 +74,18 @@ const AdminProductType = () => {
     if (res?.status === "OK") {
       message.success("Xóa thành công");
       queryClient.invalidateQueries(["product-types"]);
+    } else {
+      message.error(res?.message || "Đã xảy ra lỗi");
+    }
+  };
+
+  const handleDeleteManyTypes = async (ids) => {
+    const res = await ProductService.deleteManyProductType(ids);
+    if (res?.status === "OK") {
+      message.success("Xóa thành công");
+      queryClient.invalidateQueries(["product-types"]);
+    } else {
+      message.error(res?.message || "Đã xảy ra lỗi");
     }
   };
 
@@ -200,6 +212,7 @@ const AdminProductType = () => {
         ]}
       />
       <TableComponent
+        handleDelteMany={handleDeleteManyTypes}
         columns={columns}
         data={dataTable}
         isLoading={isLoading}

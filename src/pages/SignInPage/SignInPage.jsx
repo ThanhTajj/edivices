@@ -12,6 +12,7 @@ import jwtDecode from 'jwt-decode'
 import { useDispatch } from 'react-redux'
 import { updateUser } from '../../redux/slides/userSlide'
 import { loadCart } from '../../redux/slides/orderSlide'
+import * as message from '../../components/Message/Message'
 
 const SignInPage = () => {
   const [email, setEmail] = useState('')
@@ -57,7 +58,12 @@ const SignInPage = () => {
       const res = await UserService.getDetailsUser(id, token)
       dispatch(updateUser({ ...res?.data, access_token: token }))
       dispatch(loadCart({ userId: id }))
-      navigate('/')
+      message.success('Đăng nhập thành công')
+      if (res?.data?.isAdmin) {
+        navigate('/system/admin')
+      } else {
+        navigate('/')
+      }
     } catch (error) {
       console.log('Get details error:', error)
     }

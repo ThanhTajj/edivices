@@ -141,6 +141,21 @@ const OrderAdmin = () => {
       ...getColumnSearchProps('address')
     },
     {
+      title: 'Sản phẩm',
+      dataIndex: 'orderItems',
+      render: (orderItems) => {
+        return (
+          <ul style={{ margin: 0, padding: 0, listStyleType: 'none' }}>
+            {orderItems?.map((item, index) => (
+              <li key={index} style={{ fontSize: '13px', marginBottom: '4px' }}>
+                {item?.name} <span style={{ color: 'red', fontWeight: 500 }}>x{item?.amount}</span>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    },
+    {
       title: 'Thời gian đặt',
       dataIndex: 'createdAt',
       sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),

@@ -144,3 +144,8 @@ export const getTypeSortSetting = async () => {
   )
   return res.data
 }
+
+export const deleteManyProductType = async (ids) => {
+  const res = await axios.post(`${process.env.REACT_APP_API_URL}/product/delete-many-type`, { ids })
+  return res.data
+}

@@ -12,6 +12,7 @@ import * as UserService from '../../services/UserService'
 import { resetUser } from '../../redux/slides/userSlide'
 import Loading from '../LoadingComponent/Loading';
 import { resetOrder } from '../../redux/slides/orderSlide';
+import * as message from '../Message/Message'
 
 const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const navigate = useNavigate()
@@ -35,6 +36,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
     dispatch(resetUser())
     dispatch(resetOrder())
     setLoading(false)
+    message.success('Đăng xuất thành công')
     navigate('/')
   }
 

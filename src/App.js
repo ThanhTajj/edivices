@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import DefaultComponent from './components/DefaultComponent/DefaultComponent'
 import { routes } from './routes'
 import { isJsonString } from './utils'
@@ -10,18 +10,34 @@ import { resetUser, updateUser } from './redux/slides/userSlide'
 import Loading from './components/LoadingComponent/Loading'
 import ScrollToTop from './components/ScrollToTop/ScrollToTop'
 
+// Nếu là admin và không ở admin panel thì redirect thẳng vào /system/admin
+const AdminGuard = ({ children }) => {
+  const user = useSelector((state) => state.user)
+  const location = useLocation()
+  const adminPath = '/system/admin'
+  const isAdminRoute = location.pathname.startsWith(adminPath)
+  const isAuthRoute = location.pathname === '/sign-in' || location.pathname === '/sign-up'
+
+  if (user?.isAdmin && !isAdminRoute && !isAuthRoute) {
+    return <Navigate to={adminPath} replace />
+  }
+  return children
+}
+
 function App() {
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const user = useSelector((state) => state.user)
 
   useEffect(() => {
-    setIsLoading(true)
-    const { storageData, decoded } = handleDecoded()
-    if (decoded?.id) {
-      handleGetDetailsUser(decoded?.id, storageData)
+    const init = async () => {
+      const { storageData, decoded } = handleDecoded()
+      if (decoded?.id) {
+        await handleGetDetailsUser(decoded?.id, storageData)
+      }
+      setIsLoading(false)
     }
-    setIsLoading(false)
+    init()
   }, [])
 
   const handleDecoded = () => {
@@ -79,7 +95,11 @@ function App() {
 
   return (
     <div style={{height: '100vh', width: '100%'}}>
-      <Loading isLoading={isLoading}>
+      {isLoading ? (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+          <span>Đang tải...</span>
+        </div>
+      ) : (
         <Router>
           <ScrollToTop />
           <Routes>
@@ -88,15 +108,17 @@ function App() {
               const Layout = route.isShowHeader ? DefaultComponent : Fragment
               return (
                 <Route key={route.path} path={route.path} element={
-                  <Layout>
-                    <Page />
-                  </Layout>
+                  <AdminGuard>
+                    <Layout>
+                      <Page />
+                    </Layout>
+                  </AdminGuard>
                 } />
               )
             })}
           </Routes>
         </Router>
-      </Loading>
+      )}
     </div>
   )
 }

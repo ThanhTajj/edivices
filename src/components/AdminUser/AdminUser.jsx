@@ -184,8 +184,11 @@ const AdminUser = () => {
         }}
       />
     ),
-    onFilter: (value, record) =>
-      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+    onFilter: (value, record) => {
+      const cellValue = record[dataIndex]
+      if (cellValue == null) return false
+      return cellValue.toString().toLowerCase().includes(value.toLowerCase())
+    },
     onFilterDropdownOpenChange: (visible) => {
       if (visible) {
         setTimeout(() => searchInput.current?.select(), 100);
@@ -197,19 +200,19 @@ const AdminUser = () => {
     {
       title: 'Tên',
       dataIndex: 'name',
-      sorter: (a, b) => a.name.length - b.name.length,
+      sorter: (a, b) => (a.name || '').length - (b.name || '').length,
       ...getColumnSearchProps('name')
     },
     {
       title: 'Email',
       dataIndex: 'email',
-      sorter: (a, b) => a.email.length - b.email.length,
+      sorter: (a, b) => (a.email || '').length - (b.email || '').length,
       ...getColumnSearchProps('email')
     },
     {
       title: 'Địa chỉ',
       dataIndex: 'address',
-      sorter: (a, b) => a.address.length - b.address.length,
+      sorter: (a, b) => (a.address || '').length - (b.address || '').length,
       ...getColumnSearchProps('address')
     },
     {
@@ -225,6 +228,12 @@ const AdminUser = () => {
           value: false,
         }
       ],
+      onFilter: (value, record) => {
+        if (value === true) {
+          return record.isAdmin === 'TRUE';
+        }
+        return record.isAdmin === 'FALSE';
+      },
     },
     {
       title: 'Số điện thoại',
@@ -350,14 +359,20 @@ const AdminUser = () => {
             <Form.Item
               label="Email"
               name="email"
-              rules={[{ required: true, message: 'Please input your email!' }]}
+              rules={[
+                { required: true, message: 'Please input your email!' },
+                { type: 'email', message: 'Email không hợp lệ!' }
+              ]}
             >
               <InputComponent value={stateUserDetails['email']} onChange={handleOnchangeDetails} name="email" />
             </Form.Item>
             <Form.Item
               label="Phone"
               name="phone"
-              rules={[{ required: true, message: 'Please input your  phone!' }]}
+              rules={[
+                { required: true, message: 'Please input your phone!' },
+                { pattern: /^(0|\+84)[3|5|7|8|9][0-9]{8}$/, message: 'Số điện thoại không hợp lệ!' }
+              ]}
             >
               <InputComponent value={stateUserDetails.phone} onChange={handleOnchangeDetails} name="phone" />
             </Form.Item>
@@ -373,7 +388,6 @@ const AdminUser = () => {
             <Form.Item
               label="Avatar"
               name="avatar"
-              rules={[{ required: true, message: 'Please input your image!' }]}
             >
               <WrapperUploadFile onChange={handleOnchangeAvatarDetails} maxCount={1}>
                 <Button >Select File</Button>

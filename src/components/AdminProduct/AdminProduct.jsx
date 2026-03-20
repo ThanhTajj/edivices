@@ -43,7 +43,7 @@ Cổng giao tiếp:`
     name: '',
     price: '',
     description: descriptionTemplate,
-    rating: '',
+    rating: 0,
     image: '',
     type: '',
     brand: '',
@@ -639,13 +639,7 @@ Màn hình:
 ...`}
               />
             </Form.Item>
-            <Form.Item
-              label="Đánh giá"
-              name="rating"
-              rules={[{ required: true, message: 'Vui lòng nhập số sao đánh giá!' }]}
-            >
-              <InputComponent value={stateProduct.rating} onChange={handleOnchange} name="rating" />
-            </Form.Item>
+
             <Form.Item
               label="Giảm giá (%)"
               name="discount"
@@ -784,13 +778,7 @@ Màn hình:
                 name="description"
               />
             </Form.Item>
-            <Form.Item
-              label="Đánh giá"
-              name="rating"
-              rules={[{ required: true, message: 'Vui lòng nhập số sao đánh giá!' }]}
-            >
-              <InputComponent value={stateProductDetails.rating} onChange={handleOnchangeDetails} name="rating" />
-            </Form.Item>
+
             <Form.Item
               label="Giảm giá (%)"
               name="discount"
