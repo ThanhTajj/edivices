@@ -206,7 +206,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
             }
         }
     }
-    
+
     const finalPrice =
         productDetails?.discount > 0
             ? Math.round(
@@ -271,7 +271,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
         <Loading isLoading={isLoading}>
             <Row style={{ padding: '16px', background: '#fff', borderRadius: '4px', height: '100%' }}>
                 <Col span={10} style={{ borderRight: '1px solid #e5e5e5', paddingRight: '8px' }}>
-                    <Image src={productDetails?.image} alt="image product" preview={true} style={{width: '500px', height: '330px', objectFit: 'cover'}}/>
+                    <Image src={productDetails?.image} alt="image product" preview={true} style={{ width: '500px', height: '330px', objectFit: 'cover' }} />
                 </Col>
                 <Col span={14} style={{ paddingLeft: '10px' }}>
                     <WrapperStyleNameProduct>{productDetails?.name}</WrapperStyleNameProduct>
@@ -309,8 +309,8 @@ const ProductDetailsComponent = ({ idProduct }) => {
                             fontSize: 13
                         }}>
                             {user?.id
-                                ? '🛒 Bạn cần mua và nhận hàng thành công để đánh giá sản phẩm này'
-                                : '🔑 Vui lòng đăng nhập và mua hàng để đánh giá'}
+                                ? 'Bạn cần mua và nhận hàng thành công để đánh giá sản phẩm này'
+                                : 'Vui lòng đăng nhập và mua hàng để đánh giá'}
                         </div>
                     )}
                     <WrapperPriceProduct>
@@ -324,20 +324,20 @@ const ProductDetailsComponent = ({ idProduct }) => {
                                         fontSize: '20px',
                                     }}
                                 >
-                                {convertPrice(productDetails?.price)}
+                                    {convertPrice(productDetails?.price)}
                                 </span>
                                 <span
                                     style={{
                                         color: '#ff3945',
                                         fontSize: '20px',
                                     }}
-                                    >
+                                >
                                     -{productDetails?.discount}%
                                 </span>
                             </WrapperPriceTextProduct>
                         ) : (
                             <WrapperPriceTextProduct>
-                            {convertPrice(productDetails?.price)}
+                                {convertPrice(productDetails?.price)}
                             </WrapperPriceTextProduct>
                         )}
                     </WrapperPriceProduct>
@@ -402,7 +402,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
                                         const parts = item.split(':')
                                         const key = parts[0]
                                         const value = parts.slice(1).join(':')
-                                        if(!value?.trim()) return null
+                                        if (!value?.trim()) return null
                                         return (
                                             <tr key={index}>
                                                 <td
@@ -439,40 +439,40 @@ const ProductDetailsComponent = ({ idProduct }) => {
                                 <div
                                     key={r._id}
                                     style={{
-                                        padding:12,
-                                        borderBottom:'1px solid #eee',
+                                        padding: 12,
+                                        borderBottom: '1px solid #eee',
                                         background: isMine ? '#eaf5ff' : 'transparent',
                                         marginTop: 10,
-                                        display:'flex',
-                                        justifyContent:'space-between',
-                                        alignItems:'center'
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center'
                                     }}
                                 >
-                                <div style={{display: 'flex', flexDirection:'column', gap: '5px'}}>
-                                    <div style={{display:'flex',alignItems:'center',gap:10}}>
-                                        <img
-                                            src={r.user?.avatar || defaultAvatar}
-                                            onError={(e) => {
-                                                e.target.src = defaultAvatar
-                                            }}
-                                            alt="avatar"
-                                            style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                            <img
+                                                src={r.user?.avatar || defaultAvatar}
+                                                onError={(e) => {
+                                                    e.target.src = defaultAvatar
+                                                }}
+                                                alt="avatar"
+                                                style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }}
                                             />
-                                        <b>{r.user?.name}</b>
+                                            <b>{r.user?.name}</b>
+                                        </div>
+                                        <Rate disabled allowHalf value={r.rating} />
+                                        <div>{r.comment}</div>
                                     </div>
-                                    <Rate disabled allowHalf value={r.rating} />
-                                    <div>{r.comment}</div>
+                                    {isMine && (
+                                        <Button
+                                            danger
+                                            size="small"
+                                            onClick={() => handleDeleteReview(r._id)}
+                                        >
+                                            Xoá đánh giá
+                                        </Button>
+                                    )}
                                 </div>
-                                {isMine && (
-                                    <Button
-                                        danger
-                                        size="small"
-                                        onClick={()=>handleDeleteReview(r._id)}
-                                    >
-                                        Xoá đánh giá
-                                    </Button>
-                                )}
-                            </div>
                             )
                         })}
                     </Col>
@@ -480,7 +480,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
                         <div style={{ fontWeight: 700, marginBottom: 12 }}>
                             Sản phẩm khác
                         </div>
-                        <Row gutter={[12,12]}>
+                        <Row gutter={[12, 12]}>
                             {mergedProducts.map(product => (
                                 <Col span={12} key={product._id}>
                                     <CardComponent
