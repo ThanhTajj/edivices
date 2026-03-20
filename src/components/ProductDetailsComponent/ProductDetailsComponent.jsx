@@ -182,6 +182,30 @@ const ProductDetailsComponent = ({ idProduct }) => {
             }
         }
     }
+
+    const handleBuyNow = () => {
+        if (!user?.id) {
+            navigate('/sign-in', { state: location?.pathname })
+        } else {
+            const orderRedux = order?.orderItems?.find((item) => item.product === productDetails?._id)
+            if ((orderRedux?.amount + numProduct) <= orderRedux?.countInStock || (!orderRedux && productDetails?.countInStock > 0)) {
+                dispatch(addOrderProduct({
+                    orderItem: {
+                        name: productDetails?.name,
+                        amount: numProduct,
+                        image: productDetails?.image,
+                        price: productDetails?.price,
+                        product: productDetails?._id,
+                        discount: productDetails?.discount,
+                        countInStock: productDetails?.countInStock
+                    }, userId: user.id
+                }))
+                navigate('/order')
+            } else {
+                setErrorLimitOrder(true)
+            }
+        }
+    }
     
     const finalPrice =
         productDetails?.discount > 0
@@ -334,7 +358,23 @@ const ProductDetailsComponent = ({ idProduct }) => {
                             </button>
                         </WrapperQualityProduct>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                        <div>
+                            <ButtonComponent
+                                size={40}
+                                styleButton={{
+                                    background: '#fff',
+                                    height: '48px',
+                                    width: '220px',
+                                    border: '1px solid rgb(13, 92, 182)',
+                                    borderRadius: '4px'
+                                }}
+                                onClick={handleAddOrderProduct}
+                                textButton={'Thêm vào giỏ hàng'}
+                                styleTextButton={{ color: 'rgb(13, 92, 182)', fontSize: '15px', fontWeight: '700' }}
+                            ></ButtonComponent>
+                            {errorLimitOrder && <div style={{ color: 'red', textAlign: 'center', marginTop: '4px' }}>Sản phẩm đã hết hàng!</div>}
+                        </div>
                         <div>
                             <ButtonComponent
                                 size={40}
@@ -345,11 +385,10 @@ const ProductDetailsComponent = ({ idProduct }) => {
                                     border: 'none',
                                     borderRadius: '4px'
                                 }}
-                                onClick={handleAddOrderProduct}
-                                textButton={'Thêm vào giỏ hàng'}
+                                onClick={handleBuyNow}
+                                textButton={'Mua ngay'}
                                 styleTextButton={{ color: '#fff', fontSize: '15px', fontWeight: '700' }}
                             ></ButtonComponent>
-                            {errorLimitOrder && <div style={{ color: 'red', textAlign: 'center' }}>Sản phẩm đã hết hàng!</div>}
                         </div>
                     </div>
                 </Col>

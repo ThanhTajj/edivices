@@ -373,6 +373,12 @@ Cổng giao tiếp:`
       )
     },
     {
+      title: 'Ngày thêm',
+      dataIndex: 'createdAt',
+      sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
+      render: (date) => date ? new Date(date).toLocaleDateString('vi-VN') : ''
+    },
+    {
       title: 'Thao tác',
       dataIndex: 'action',
       render: renderAction
@@ -390,6 +396,7 @@ Cổng giao tiếp:`
         discount: product.discount,
         description: product.description,
         image: product.image,
+        createdAt: product.createdAt,
         type:
           typeof product.type === 'object'
             ? product.type.type
@@ -429,6 +436,15 @@ Cổng giao tiếp:`
     setStateProductDetails(inittial())
     form.resetFields()
   };
+
+  useEffect(() => {
+    if (isSuccessUpdated && dataUpdated?.status === 'OK') {
+      message.success('Cập nhật thành công')
+      handleCloseDrawer()
+    } else if (isErrorUpdated) {
+      message.error()
+    }
+  }, [isSuccessUpdated])
 
   useEffect(() => {
     if (isSuccessUpdated && dataUpdated?.status === 'OK') {
@@ -488,6 +504,14 @@ Cổng giao tiếp:`
       ...stateProductDetails,
       [e.target.name]: e.target.value
     })
+  }
+
+  const handleValuesChange = (changedValues, allValues) => {
+    setStateProduct((prev) => ({ ...prev, ...changedValues }));
+  }
+
+  const handleValuesChangeDetails = (changedValues, allValues) => {
+    setStateProductDetails((prev) => ({ ...prev, ...changedValues }));
   }
 
   const handleOnchangeAvatar = async ({ fileList }) => {
@@ -570,6 +594,7 @@ Cổng giao tiếp:`
             onFinish={onFinish}
             autoComplete="on"
             form={form}
+            onValuesChange={handleValuesChange}
           >
             <Form.Item
               label="Tên sản phẩm"
@@ -715,6 +740,7 @@ Màn hình:
             onFinish={onUpdateProduct}
             autoComplete="on"
             form={form}
+            onValuesChange={handleValuesChangeDetails}
           >
             <Form.Item
               label="Tên sản phẩm"

@@ -112,6 +112,15 @@ const AdminUser = () => {
   const { data: dataDeleted, isLoading: isLoadingDeleted, isSuccess: isSuccessDelected, isError: isErrorDeleted } = mutationDeleted
   const { data: dataDeletedMany, isLoading: isLoadingDeletedMany, isSuccess: isSuccessDelectedMany, isError: isErrorDeletedMany } = mutationDeletedMany
 
+  useEffect(() => {
+    if (isSuccessUpdated && dataUpdated?.status === 'OK') {
+      message.success('Cập nhật thành công')
+      handleCloseDrawer()
+    } else if (isErrorUpdated) {
+      message.error()
+    }
+  }, [isSuccessUpdated])
+
   const queryClient = useQueryClient()
   const users = queryClient.getQueryData(['users'])
   const isFetchingUser = useIsFetching(['users'])
@@ -307,6 +316,10 @@ const AdminUser = () => {
     })
   }
 
+  const handleValuesChangeDetails = (changedValues, allValues) => {
+    setStateUserDetails((prev) => ({ ...prev, ...changedValues }))
+  }
+
   const handleOnchangeAvatarDetails = async ({ fileList }) => {
     const file = fileList[0]
     if (!file.url && !file.preview) {
@@ -347,6 +360,7 @@ const AdminUser = () => {
             onFinish={onUpdateUser}
             autoComplete="on"
             form={form}
+            onValuesChange={handleValuesChangeDetails}
           >
             <Form.Item
               label="Name"
